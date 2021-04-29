@@ -34,8 +34,9 @@ public class LoginScreen {
         new Button("Connexion", new Runnable() {
             @Override
             public void run() {
-                System.out.println(username.getText());
-                System.out.println(password.getText());
+                boolean isConnected = DBQueries.userConnection(username.getText(),(password.getText()));
+                String message = isConnected ? "Connexion valide." : "Connexion invalide, veuillez vérifier vos identifiants.";
+                lblOutput.setText(message);
             }
         }).addTo(panel);
 
