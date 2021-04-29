@@ -20,6 +20,13 @@
   </properties>
 
   <dependencies>
+    <!-- Connexion à la base mongoDB -->
+    <dependency>
+      <groupId>org.mongodb</groupId>
+      <artifactId>mongodb-driver-sync</artifactId>
+      <version>4.2.2</version>
+    </dependency>
+    <!-- Interface Console -->
     <dependency>
       <groupId>com.googlecode.lanterna</groupId>
       <artifactId>lanterna</artifactId>

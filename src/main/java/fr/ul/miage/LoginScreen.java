@@ -25,20 +25,17 @@ public class LoginScreen {
         final Label lblOutput = new Label("");
 
         panel.addComponent(new Label("Nom d'utilisateur :"));
-        final TextBox txtNum1 = new TextBox().addTo(panel);
-        //final TextBox txtNum1 = new TextBox().setValidationPattern(Pattern.compile("[0-9]*")).addTo(panel);
+        final TextBox username = new TextBox().addTo(panel);
 
         panel.addComponent(new Label("Mot de passe :"));
-        final TextBox txtNum2 = new TextBox().addTo(panel);
+        final TextBox password = new TextBox().addTo(panel);
 
         panel.addComponent(new EmptySpace(new TerminalSize(0, 0)));
         new Button("Connexion", new Runnable() {
             @Override
             public void run() {
-                String num1 = txtNum1.getText();
-                String num2 = txtNum2.getText();
-                System.out.println(num1);
-                System.out.println(num2);
+                System.out.println(username.getText());
+                System.out.println(password.getText());
             }
         }).addTo(panel);
 
