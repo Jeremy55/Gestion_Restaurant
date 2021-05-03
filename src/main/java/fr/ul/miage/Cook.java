@@ -6,6 +6,8 @@ import com.googlecode.lanterna.gui2.Label;
 import com.googlecode.lanterna.gui2.Panel;
 import org.bson.types.ObjectId;
 
+import java.io.IOException;
+
 public class Cook extends Staff {
 
     public Cook(ObjectId id, String login, String mdp, String nom, String prenom) {
@@ -20,6 +22,10 @@ public class Cook extends Staff {
         panel.addComponent(new Label("Test"));
         BasicWindow window = new BasicWindow();
         window.setComponent(panel);
-        Main.terminal.switchWindow(window);
+        try {
+            MainTerminal.getConsole().switchWindow(window);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

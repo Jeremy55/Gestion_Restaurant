@@ -10,13 +10,25 @@ import com.googlecode.lanterna.terminal.Terminal;
 import java.io.IOException;
 
 public class MainTerminal {
-    private MultiWindowTextGUI gui;
+    private static MainTerminal console;
 
-    public MainTerminal(BasicWindow window) throws IOException {
+    private MultiWindowTextGUI gui;
+    private BasicWindow currentWindow;
+
+    private MainTerminal(BasicWindow window) throws IOException {
         // Create gui and start gui
         setup();
-        gui.addWindowAndWait(window);
+        currentWindow = window;
     }
+
+    public static MainTerminal getConsole() throws IOException {
+        if(console == null){
+            LoginScreen loginScreen = new LoginScreen();
+            console = new MainTerminal(loginScreen);
+        }
+        return console;
+    }
+
 
 
     private void setup() throws IOException {
@@ -30,5 +42,9 @@ public class MainTerminal {
     public void switchWindow(BasicWindow window){
         gui.removeWindow(gui.getActiveWindow());
         gui.addWindowAndWait(window);
+    }
+
+    public void start(){
+        gui.addWindowAndWait(currentWindow);
     }
 }
