@@ -18,6 +18,7 @@ public class MainTerminal {
         gui.addWindowAndWait(window);
     }
 
+
     private void setup() throws IOException {
         // Setup terminal and screen layers
         Terminal terminal = new DefaultTerminalFactory().createTerminal();

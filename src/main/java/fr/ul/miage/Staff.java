@@ -60,14 +60,9 @@ public class Staff {
         this.prenom = prenom;
     }
 
-    @Override
-    public String toString() {
-        return "Staff{" +
-                "id=" + _id +
-                ", login='" + login + '\'' +
-                ", mdp='" + mdp + '\'' +
-                ", nom='" + nom + '\'' +
-                ", prenom='" + prenom + '\'' +
-                '}';
+    public void Screen(){
+        System.out.println("je suis staff");
     }
+
+
 }

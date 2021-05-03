@@ -8,13 +8,11 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.*;
 import static com.mongodb.client.model.Filters.*;
 import org.bson.Document;
-import org.bson.json.JsonObject;
 
 public class DBQueries {
     private static MongoClient mongoClient = MongoClients.create(
             "mongodb+srv://admin:qFoOXXTZeYMRcihb@cluster0.vfnf9.mongodb.net/GestionRestaurant?retryWrites=true&w=majority");
     private static MongoDatabase database = mongoClient.getDatabase("GestionRestaurant");
-
 
     public static boolean userConnection(String login, String mdp){
         MongoCollection<Document> collection = database.getCollection("Personnel");
@@ -24,10 +22,15 @@ public class DBQueries {
 
     public static Staff getStaff(String login){
         MongoCollection<Document> collection = database.getCollection("Personnel");
-        Document role = collection.find(eq("login", login)).first();
+        Document staff = collection.find(eq("login", login)).first();
         Gson gson = new GsonBuilder().create();
-        Staff personne = gson.fromJson(role.toJson(), Staff.class);
-        return personne;
+        String role = staff.get("role").toString();
+        switch (role){
+            case "cuisinier":
+                return gson.fromJson(staff.toJson(), Cook.class);
+            default:
+                return null;
+        }
     }
 
 }

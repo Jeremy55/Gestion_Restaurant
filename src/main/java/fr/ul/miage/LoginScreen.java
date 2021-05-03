@@ -32,8 +32,13 @@ public class LoginScreen extends BasicWindow {
             @Override
             public void run() {
                 boolean isConnected = DBQueries.userConnection(username.getText(),(password.getText()));
-                String message = isConnected ? "Connexion valide." : "Connexion invalide, veuillez vérifier vos identifiants.";
-                lblOutput.setText(message);
+                if(isConnected){
+                    Staff a = DBQueries.getStaff(username.getText());
+                    a.Screen();
+
+                } else{
+                    lblOutput.setText("Connexion invalide, veuillez vérifier vos identifiants.");
+                }
             }
         }).addTo(panel);
 
