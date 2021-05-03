@@ -1,11 +1,14 @@
 package fr.ul.miage;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.*;
 import static com.mongodb.client.model.Filters.*;
 import org.bson.Document;
+import org.bson.json.JsonObject;
 
 public class DBQueries {
     private static MongoClient mongoClient = MongoClients.create(
@@ -17,6 +20,14 @@ public class DBQueries {
         MongoCollection<Document> collection = database.getCollection("Personnel");
         long nb = collection.countDocuments(and(eq("login", login), eq("mdp", mdp)));
         return nb==1;
+    }
+
+    public static Staff getStaff(String login){
+        MongoCollection<Document> collection = database.getCollection("Personnel");
+        Document role = collection.find(eq("login", login)).first();
+        Gson gson = new GsonBuilder().create();
+        Staff personne = gson.fromJson(role.toJson(), Staff.class);
+        return personne;
     }
 
 }
