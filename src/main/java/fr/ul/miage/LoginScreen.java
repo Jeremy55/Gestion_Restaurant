@@ -11,12 +11,9 @@ import com.googlecode.lanterna.gui2.*;
 import java.io.IOException;
 import java.util.regex.Pattern;
 
-public class LoginScreen {
-    public static void main(String[] args) throws IOException {
-        // Setup terminal and screen layers
-        Terminal terminal = new DefaultTerminalFactory().createTerminal();
-        Screen screen = new TerminalScreen(terminal);
-        screen.startScreen();
+public class LoginScreen extends BasicWindow {
+
+    public LoginScreen() {
 
         // Create panel to hold components
         Panel panel = new Panel();
@@ -43,12 +40,9 @@ public class LoginScreen {
         panel.addComponent(new EmptySpace(new TerminalSize(0, 0)));
         panel.addComponent(lblOutput);
 
-        // Create window to hold the panel
-        BasicWindow window = new BasicWindow();
-        window.setComponent(panel);
-
-        // Create gui and start gui
-        MultiWindowTextGUI gui = new MultiWindowTextGUI(screen, new DefaultWindowManager(), new EmptySpace(TextColor.ANSI.BLUE));
-        gui.addWindowAndWait(window);
+        // Set the panel
+        this.setComponent(panel);
     }
+
+
 }
