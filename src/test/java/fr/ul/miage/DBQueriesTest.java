@@ -8,27 +8,29 @@ import static org.junit.jupiter.api.Assertions.assertTimeout;
 
 public class DBQueriesTest {
 
+    DBQueries dbQueries = new DBQueries();
+
     @Test
     void testConnectionVrai(){
-        boolean reponse = DBQueries.userConnection("jpierre", "jpierre");
+        boolean reponse = dbQueries.userConnection("jpierre", "jpierre");
         assertEquals(reponse, true);
     }
 
     @Test
     void testConnectionFaux(){
-        boolean reponse = DBQueries.userConnection("faux", "faux");
+        boolean reponse = dbQueries.userConnection("faux", "faux");
         assertEquals(reponse, false);
     }
 
     @Test
     void testMdpFaux(){
-        boolean reponse = DBQueries.userConnection("jpierre", "jpierres");
+        boolean reponse = dbQueries.userConnection("jpierre", "jpierres");
         assertEquals(reponse, false);
     }
 
     @Test
     void testLoginFaux(){
-        boolean reponse = DBQueries.userConnection("jpierres", "jpierre");
+        boolean reponse = dbQueries.userConnection("jpierres", "jpierre");
         assertEquals(reponse, false);
     }
 
@@ -36,7 +38,7 @@ public class DBQueriesTest {
     void timeoutConnectionVrai()
     {
         assertTimeout(ofSeconds(5), () -> {
-            DBQueries.userConnection("jpierre", "jpierre");
+            dbQueries.userConnection("jpierre", "jpierre");
         });
     }
 
@@ -44,6 +46,6 @@ public class DBQueriesTest {
     void timeoutConnectionFaux()
     {
         assertTimeout(ofSeconds(5), () -> {
-            DBQueries.userConnection("faux", "faux");
+            dbQueries.userConnection("faux", "faux");
         });
     }}

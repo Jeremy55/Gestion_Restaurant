@@ -4,12 +4,12 @@ import org.bson.types.ObjectId;
 
 public abstract class Staff {
 
-
     private ObjectId _id;
     private String login;
     private String mdp;
     private String nom;
     private String prenom;
+    private DBQueries dbQueries;
 
     public Staff(ObjectId id, String login, String mdp, String nom, String prenom) {
         this._id = id;
@@ -58,6 +58,14 @@ public abstract class Staff {
 
     public void setPrenom(String prenom) {
         this.prenom = prenom;
+    }
+
+    public  void setDbQueries(DBQueries dbQueries) {
+        this.dbQueries = dbQueries;
+    }
+
+    protected DBQueries getDbQueries(){
+        return dbQueries;
     }
 
     abstract void Screen();

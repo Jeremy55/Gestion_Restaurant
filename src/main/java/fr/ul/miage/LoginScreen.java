@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.regex.Pattern;
 
 public class LoginScreen extends BasicWindow {
+    private final DBQueries dbQueries = new DBQueries();
 
     public LoginScreen() {
 
@@ -31,9 +32,10 @@ public class LoginScreen extends BasicWindow {
         new Button("Connexion", new Runnable() {
             @Override
             public void run() {
-                boolean isConnected = DBQueries.userConnection(username.getText(),(password.getText()));
+                boolean isConnected = dbQueries.userConnection(username.getText(),(password.getText()));
                 if(isConnected){
-                    Staff a = DBQueries.getStaff(username.getText());
+                    Staff a = dbQueries.getStaff(username.getText());
+                    a.setDbQueries(dbQueries);
                     a.Screen();
                 } else{
                     lblOutput.setText("Connexion invalide, veuillez vérifier vos identifiants.");
@@ -47,6 +49,4 @@ public class LoginScreen extends BasicWindow {
         // Set the panel
         this.setComponent(panel);
     }
-
-
 }

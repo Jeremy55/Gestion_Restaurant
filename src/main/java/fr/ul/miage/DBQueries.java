@@ -9,18 +9,24 @@ import com.mongodb.client.*;
 import static com.mongodb.client.model.Filters.*;
 import org.bson.Document;
 
-public class DBQueries {
-    private static final MongoClient mongoClient = MongoClients.create(
-            "mongodb+srv://admin:qFoOXXTZeYMRcihb@cluster0.vfnf9.mongodb.net/GestionRestaurant?retryWrites=true&w=majority");
-    private static final MongoDatabase database = mongoClient.getDatabase("GestionRestaurant");
+import java.io.IOException;
 
-    public static boolean userConnection(String login, String mdp){
+public class DBQueries {
+
+    private final MongoDatabase database;
+
+    public DBQueries(){
+        MongoClient mongoClient = MongoClients.create("mongodb+srv://admin:qFoOXXTZeYMRcihb@cluster0.vfnf9.mongodb.net/GestionRestaurant?retryWrites=true&w=majority");
+        this.database = mongoClient.getDatabase("GestionRestaurant");
+    }
+
+    public boolean userConnection(String login, String mdp){
         MongoCollection<Document> collection = database.getCollection("Personnel");
         long nb = collection.countDocuments(and(eq("login", login), eq("mdp", mdp)));
         return nb==1;
     }
 
-    public static Staff getStaff(String login){
+    public Staff getStaff(String login){
         MongoCollection<Document> collection = database.getCollection("Personnel");
         Document staff = collection.find(eq("login", login)).first();
         Gson gson = new GsonBuilder().create();
