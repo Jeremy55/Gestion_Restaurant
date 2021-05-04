@@ -10,9 +10,9 @@ import static com.mongodb.client.model.Filters.*;
 import org.bson.Document;
 
 public class DBQueries {
-    private static MongoClient mongoClient = MongoClients.create(
+    private static final MongoClient mongoClient = MongoClients.create(
             "mongodb+srv://admin:qFoOXXTZeYMRcihb@cluster0.vfnf9.mongodb.net/GestionRestaurant?retryWrites=true&w=majority");
-    private static MongoDatabase database = mongoClient.getDatabase("GestionRestaurant");
+    private static final MongoDatabase database = mongoClient.getDatabase("GestionRestaurant");
 
     public static boolean userConnection(String login, String mdp){
         MongoCollection<Document> collection = database.getCollection("Personnel");

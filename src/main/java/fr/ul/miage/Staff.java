@@ -2,7 +2,7 @@ package fr.ul.miage;
 
 import org.bson.types.ObjectId;
 
-public class Staff {
+public abstract class Staff {
 
 
     private ObjectId _id;
@@ -60,9 +60,7 @@ public class Staff {
         this.prenom = prenom;
     }
 
-    public void Screen(){
-        System.out.println("je suis staff");
-    }
+    abstract void Screen();
 
 
 }

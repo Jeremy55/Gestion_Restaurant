@@ -16,7 +16,6 @@ public class Cook extends Staff {
 
     @Override
     public void Screen(){
-        System.out.println("je suis cook");
         Panel panel = new Panel();
         panel.setLayoutManager(new GridLayout(2));
         panel.addComponent(new Label("Test"));

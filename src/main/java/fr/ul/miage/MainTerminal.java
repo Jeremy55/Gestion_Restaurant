@@ -13,7 +13,7 @@ public class MainTerminal {
     private static MainTerminal console;
 
     private MultiWindowTextGUI gui;
-    private BasicWindow currentWindow;
+    private final BasicWindow currentWindow;
 
     private MainTerminal(BasicWindow window) throws IOException {
         // Create gui and start gui
