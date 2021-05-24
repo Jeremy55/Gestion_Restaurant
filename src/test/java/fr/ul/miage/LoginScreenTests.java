@@ -11,8 +11,8 @@ public class LoginScreenTests {
     private DBQueries dbQueries = mock(DBQueries.class);
 
     @Test
-    public void test(){
-        when(dbQueries.userConnection("a","a")).thenReturn(true);
-        Assertions.assertEquals(dbQueries.userConnection("a","a"),true);
+    public void testConnexionValide(){
+        when(dbQueries.userConnection("jpierre","jpierre")).thenReturn(true);
+        LoginScreen a = new LoginScreen();
     }
 }

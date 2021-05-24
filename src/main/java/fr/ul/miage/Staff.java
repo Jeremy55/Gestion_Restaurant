@@ -1,6 +1,10 @@
 package fr.ul.miage;
 
+import com.googlecode.lanterna.gui2.Button;
+import com.googlecode.lanterna.gui2.Panel;
 import org.bson.types.ObjectId;
+
+import java.io.IOException;
 
 public abstract class Staff {
 
@@ -69,6 +73,22 @@ public abstract class Staff {
     }
 
     abstract void Screen();
+
+    protected Panel deconnection(){
+        Panel panel = new Panel();
+        new Button("Déconnection", new Runnable() {
+            @Override
+            public void run() {
+                LoginScreen loginScreen = new LoginScreen();
+                try {
+                    MainTerminal.getConsole().switchWindow(loginScreen);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).addTo(panel);
+        return panel;
+    }
 
 
 }

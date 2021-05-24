@@ -14,21 +14,10 @@ public class Cook extends Staff {
 
     @Override
     public void Screen(){
-        Panel panel = new Panel();
+        Panel panel = super.deconnection();
         panel.setLayoutManager(new GridLayout(2));
-        panel.addComponent(new Label("Test"));
         panel.addComponent(new EmptySpace(new TerminalSize(0, 0)));
-        new Button("Déconnection", new Runnable() {
-            @Override
-            public void run() {
-                LoginScreen loginScreen = new LoginScreen();
-                try {
-                    MainTerminal.getConsole().switchWindow(loginScreen);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).addTo(panel);
+        panel.addComponent(new Label("Test"));
         BasicWindow window = new BasicWindow();
         window.setComponent(panel);
         try {
