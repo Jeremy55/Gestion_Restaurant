@@ -17,7 +17,7 @@ public class Cook extends Staff {
         Panel panel = super.deconnection();
         panel.setLayoutManager(new GridLayout(2));
         panel.addComponent(new EmptySpace(new TerminalSize(0, 0)));
-        panel.addComponent(new Label("Test"));
+        panel.addComponent(new Label("Menu cuisinier"));
         BasicWindow window = new BasicWindow();
         window.setComponent(panel);
         try {
