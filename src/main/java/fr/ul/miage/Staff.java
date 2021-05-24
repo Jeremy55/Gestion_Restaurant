@@ -72,7 +72,7 @@ public abstract class Staff {
         return dbQueries;
     }
 
-    abstract void Screen();
+    abstract void Screen() throws IOException;
 
     protected Panel deconnection(){
         Panel panel = new Panel();

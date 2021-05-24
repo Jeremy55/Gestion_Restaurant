@@ -36,7 +36,11 @@ public class LoginScreen extends BasicWindow {
                 if(isConnected){
                     Staff a = dbQueries.getStaff(username.getText());
                     a.setDbQueries(dbQueries);
-                    a.Screen();
+                    try {
+                        a.Screen();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 } else{
                     lblOutput.setText("Connexion invalide, veuillez vérifier vos identifiants.");
                 }

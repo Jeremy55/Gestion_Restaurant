@@ -10,6 +10,8 @@ import static com.mongodb.client.model.Filters.*;
 import org.bson.Document;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DBQueries {
 
@@ -34,9 +36,42 @@ public class DBQueries {
         switch (role){
             case "cuisinier":
                 return gson.fromJson(staff.toJson(), Cook.class);
+            case "assistant de service":
+                return gson.fromJson(staff.toJson(), ServiceAssistant.class);
             default:
                 return null;
         }
     }
+
+    public List<Table> getAllTable(){
+        MongoCollection<Document> collectionTable = database.getCollection("Table");
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        FindIterable<Document> table =  collectionTable.find();
+
+        List<Table> tables = new ArrayList<Table>();
+        for(Document doc : table){
+            tables.add(gson.fromJson(doc.toJson(),Table.class));
+        }
+
+        return tables;
+    }
+
+    public void updateTableLibre(int numero, int etage){
+        MongoCollection<Document> collectionTable = database.getCollection("Table");
+        Document query = new Document().append("numero", numero).append("etage", etage);
+        Document table = collectionTable.find(and(eq("numero", numero), eq("etage", etage))).first();
+
+
+        Document setData = new Document();
+        setData.append("etat", "libre");
+
+        Document update = new Document();
+        update.append("$set", setData);
+
+        collectionTable.updateOne(query, update);
+
+
+    }
+
 
 }
