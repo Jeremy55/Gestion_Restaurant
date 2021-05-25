@@ -9,7 +9,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+
+
 public class Cook extends Staff {
+
+    public class BackLog{
+
+    }
+
+    private String message;
 
     public Cook(ObjectId id, String login, String mdp, String nom, String prenom) {
         super(id, login, mdp, nom, prenom);
@@ -19,7 +27,11 @@ public class Cook extends Staff {
     public void Screen() {
         Panel panel = super.deconnection();
         buttonAddRecipe().addTo(panel);
-        panel.setLayoutManager(new GridLayout(2));
+        if(!(message == null)){
+            panel.addComponent(new Label(message));
+            message = null;
+        }
+        panel.setLayoutManager(new GridLayout(1));
         panel.addComponent(new EmptySpace(new TerminalSize(0, 0)));
         panel.addComponent(new Label("Menu cuisinier"));
         BasicWindow window = new BasicWindow();
@@ -107,9 +119,11 @@ public class Cook extends Staff {
                 for(ComboBox<String> c : ingredientList){
                     listeIngredients.add(c.getText());
                 }
+                message = "Le plat " + name.getText() + " a bien été ajouté dans la BDD.";
                 ArrayList<String> categories = new ArrayList<>();
                 categories.add(categorie.getText());
                 getDbQueries().newDish(name.getText(),listeIngredients,categories,Double.parseDouble(prix.getText()));
+                Screen(); //Retour au menu.
             }
         });
     }
