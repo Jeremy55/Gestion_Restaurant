@@ -6,15 +6,78 @@ import org.bson.types.ObjectId;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Pattern;
 
 
 
 public class Cook extends Staff {
 
-    public class BackLog{
+    public class Plat{
+        ObjectId _id;
+        String nom;
+        ArrayList<String> Ingredient;
+        ArrayList<String> Categorie;
+        Double prix;
+        boolean platDuJour;
 
+        public Plat(ObjectId _id, String nom, ArrayList<String> ingredient, ArrayList<String> categorie, Double prix, boolean platDuJour) {
+            this._id = _id;
+            this.nom = nom;
+            Ingredient = ingredient;
+            Categorie = categorie;
+            this.prix = prix;
+            this.platDuJour = platDuJour;
+        }
+
+        @Override
+        public String toString() {
+            return "Plat{" +
+                    "_id=" + _id +
+                    ", nom='" + nom + '\'' +
+                    ", Ingredient=" + Ingredient +
+                    ", Categorie=" + Categorie +
+                    ", prix=" + prix +
+                    ", platDuJour=" + platDuJour +
+                    '}';
+        }
+    }
+
+    public class Preparation{
+        ObjectId _id;
+        String heureCommande;
+        Boolean debut;
+        String fin;
+        ObjectId Plat;
+        Boolean menuEnfant;
+
+        public Preparation(ObjectId _id, String heureCommande, Boolean debut, ObjectId plat, Boolean menuEnfant) {
+            this._id = _id;
+            this.heureCommande = heureCommande;
+            this.debut = debut;
+            Plat = plat;
+            this.menuEnfant = menuEnfant;
+        }
+
+        public Preparation(ObjectId _id, String heureCommande, Boolean debut, String fin, ObjectId plat, Boolean menuEnfant) {
+            this._id = _id;
+            this.heureCommande = heureCommande;
+            this.debut = debut;
+            this.fin = fin;
+            Plat = plat;
+            this.menuEnfant = menuEnfant;
+        }
+
+        @Override
+        public String toString() {
+            return "Preparation{" +
+                    "_id=" + _id +
+                    ", heureCommande=" + heureCommande +
+                    ", debut=" + debut +
+                    ", fin=" + fin +
+                    ", Plat=" + Plat +
+                    ", menuEnfant=" + menuEnfant +
+                    '}';
+        }
     }
 
     private String message;
@@ -23,17 +86,29 @@ public class Cook extends Staff {
         super(id, login, mdp, nom, prenom);
     }
 
+    /**
+     * Fenêtre principale du programme avec le menu du cusinier.
+     */
     @Override
-    public void Screen() {
+    public void screen() {
         Panel panel = super.deconnection();
         buttonAddRecipe().addTo(panel);
+        buttonBackLogPreparations().addTo(panel);
         if(!(message == null)){
             panel.addComponent(new Label(message));
             message = null;
         }
+        setupWindowAndSwitch(panel,"Menu");
+    }
+
+    /**
+     * Permet de mettre en place la fenêtre et de switcher cette fenêtre dans le terminal principal.
+     * @param panel
+     */
+    private void setupWindowAndSwitch(Panel panel,String menuName){
         panel.setLayoutManager(new GridLayout(1));
         panel.addComponent(new EmptySpace(new TerminalSize(0, 0)));
-        panel.addComponent(new Label("Menu cuisinier"));
+        panel.addComponent(new Label(menuName));
         BasicWindow window = new BasicWindow();
         window.setComponent(panel);
         try {
@@ -41,6 +116,20 @@ public class Cook extends Staff {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private Button buttonBackLogPreparations(){
+        return new Button("Voir les plats à preparer", new Runnable() {
+            @Override
+            public void run(){
+                Panel panel = new Panel();
+                for(Preparation p : getDbQueries().getPreparations()){
+                    System.out.println(p.Plat);
+                    System.out.println(getDbQueries().getPlat(p.Plat));
+                }
+                setupWindowAndSwitch(panel,"Plat à préparer");
+            }
+        });
     }
 
     private Button buttonAddRecipe(){
@@ -62,15 +151,7 @@ public class Cook extends Staff {
                 buttonAddIngredient(panel,ingredientsList).addTo(panel); // Bouton qui permet d'ajouter d'autre comboBox contenant des ingrédients dans la console.
                 ingredientsList.add(ingredientComboBox());// ComboBox contenant les ingrédients disponibles dans la BDD.
                 ingredientsList.get(0).addTo(panel); // Ajoute la ComboBox dans l'interface.
-                panel.setLayoutManager(new GridLayout(1));
-                panel.addComponent(new EmptySpace(new TerminalSize(0, 0)));
-                BasicWindow window = new BasicWindow();
-                window.setComponent(panel);
-                try {
-                    MainTerminal.getConsole().switchWindow(window);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                setupWindowAndSwitch(panel,"Plat à ajouter");
             }
         });
     }
@@ -106,7 +187,7 @@ public class Cook extends Staff {
         return new Button("Retour au menu", new Runnable() {
             @Override
             public void run() {
-                Screen();
+                screen();
             }
         });
     }
@@ -123,7 +204,7 @@ public class Cook extends Staff {
                 ArrayList<String> categories = new ArrayList<>();
                 categories.add(categorie.getText());
                 getDbQueries().newDish(name.getText(),listeIngredients,categories,Double.parseDouble(prix.getText()));
-                Screen(); //Retour au menu.
+                screen(); //Retour au menu.
             }
         });
     }

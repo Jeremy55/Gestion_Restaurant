@@ -72,7 +72,7 @@ public abstract class Staff {
         return dbQueries;
     }
 
-    abstract void Screen();
+    abstract void screen();
 
     protected Panel deconnection(){
         Panel panel = new Panel();

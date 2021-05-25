@@ -78,4 +78,28 @@ public class DBQueries {
         collection.insertOne(plat);
     }
 
+    public ArrayList<Cook.Preparation> getPreparations(){
+        MongoCollection<Document> collection = database.getCollection("Preparation");
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        FindIterable<Document>  preparationsDoc = collection.find(eq("debut", false));
+        ArrayList<Cook.Preparation> preparations = new ArrayList<>();
+        for(Document d : preparationsDoc ){
+            System.out.println(d.toJson().toString());
+            Cook.Preparation preparation = gson.fromJson(d.toJson(), Cook.Preparation.class);
+            preparation.Plat = d.getObjectId("Plat");
+            preparation._id = d.getObjectId("_id");
+            preparations.add(preparation);
+        }
+        return preparations;
+    }
+
+    public Cook.Plat getPlat(ObjectId _id){
+        MongoCollection<Document> collection = database.getCollection("Plat");
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        Document platDoc = collection.find(eq("_id", _id)).first();
+        Cook.Plat plat = gson.fromJson(platDoc.toJson(), Cook.Plat.class);
+        plat._id = platDoc.getObjectId("_id");
+        return plat;
+    }
+
 }
