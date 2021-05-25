@@ -12,7 +12,7 @@ import java.util.List;
 public class Waiter extends Staff {
     private List<ObjectId> Table;
 
-    public Waiter( String login, String mdp, String nom, String prenom) {
+    public Waiter(String login, String mdp, String nom, String prenom) {
         super(login, mdp, nom, prenom);
         Table = new ArrayList<ObjectId>();
     }

@@ -20,6 +20,11 @@ public class Butler extends Staff {
         MainTerminal.getConsole().switchWindow(AffichageTable(new Label("")));
     }
 
+    /**
+     * Permet d'afficher toutes les tables et de pouvoir en sélectionner une
+     * @param lb
+     * @return
+     */
     public BasicWindow AffichageTable(Label lb){
         Panel panel = super.deconnection();
         panel.setLayoutManager(new GridLayout(1));
@@ -55,6 +60,12 @@ public class Butler extends Staff {
         return window;
     }
 
+    /**
+     * Permet d'afficher les serveurs affectés et non affectés à une table et permet de pouvoir affecter un serveur à une table
+     * @param e
+     * @param lb
+     * @return
+     */
     public BasicWindow AssignerServeur(Table e, Label lb){
         Panel panel = super.deconnection();
         Label lblOutput = lb;

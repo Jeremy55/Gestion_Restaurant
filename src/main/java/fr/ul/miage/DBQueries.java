@@ -52,14 +52,18 @@ public class DBQueries {
         }
     }
 
+    /**
+     * Cette méthode permet de récupérer toutes les tables de la base de données
+     * @return une liste de Table
+     */
     public List<Table> getAllTable(){
         MongoCollection<Document> collectionTable = database.getCollection("Table");
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        FindIterable<Document> table =  collectionTable.find();
+        FindIterable<Document> table =  collectionTable.find(); //On récupère toutes les tables
 
         List<Table> tables = new ArrayList<Table>();
         for(Document doc : table){
-            Table a = gson.fromJson(doc.toJson(),Table.class);
+            Table a = gson.fromJson(doc.toJson(),Table.class); //On transforme les documents en table
             a.set_id(doc.getObjectId("_id"));
             tables.add(a);
         }
@@ -67,6 +71,10 @@ public class DBQueries {
         return tables;
     }
 
+    /**
+     * Permet de mettre l'état d'une table de débarassée à libre
+     * @param
+     */
     public void updateTableLibre(ObjectId id){
         MongoCollection<Document> collectionTable = database.getCollection("Table");
         Document query = new Document().append("_id", id);
@@ -81,6 +89,11 @@ public class DBQueries {
         collectionTable.updateOne(query, update);
     }
 
+    /**
+     * Permet de récupérer la liste des serveurs qui sont affectés à une table
+     * @param t
+     * @return liste de serveurs affectés
+     */
     public List<Waiter> getServeurAffecte(Table t){
         MongoCollection<Document> collectionPersonnel = database.getCollection("Personnel");
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -109,6 +122,11 @@ public class DBQueries {
         return serveursTable;
     }
 
+    /**
+     * Permet de récupérer la liste des serveurs qui ne sont pas affectés à une table
+     * @param t
+     * @return liste de serveurs non affectés
+     */
     public List<Waiter> getServeurNonAffecte(Table t){
         MongoCollection<Document> collectionPersonnel = database.getCollection("Personnel");
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -135,6 +153,11 @@ public class DBQueries {
         return serveursTable;
     }
 
+    /**
+     * Permet d'affecter un serveur à une table
+     * @param table
+     * @param serveur
+     */
     public void AffecteServeurTable(Table table, Waiter serveur){
         MongoCollection<Document> collectionPersonnel = database.getCollection("Personnel");
         Document query = new Document().append("login", serveur.getLogin());

@@ -15,19 +15,6 @@ import java.util.TimerTask;
 
 public class ServiceAssistant extends Staff {
 
-   /* class Rafraichir extends TimerTask {
-        public void run() {
-            System.out.println("test");
-            try {
-                MainTerminal.getConsole().switchWindow(DebarasserTable(new Label("")));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            System.out.println("test2");
-
-        }
-    }*/
-
     public ServiceAssistant(ObjectId id, String login, String mdp, String nom, String prenom) {
         super(login, mdp, nom, prenom);
     }
@@ -35,11 +22,15 @@ public class ServiceAssistant extends Staff {
 
     @Override
     public void Screen() throws IOException {
-        /*Timer timer = new Timer();
-        timer.schedule(new Rafraichir(), 0, 5000);*/
         MainTerminal.getConsole().switchWindow(DebarasserTable(new Label("")));
     }
 
+    /**
+     * Permet d'afficher la fenêtre pour dresser une table
+     * @param t
+     * @param lblOutput
+     * @return
+     */
     public BasicWindow DresserTable(Table t, Label lblOutput) {
         Panel panel = new Panel();
         panel.setLayoutManager(new GridLayout(1));
@@ -69,6 +60,11 @@ public class ServiceAssistant extends Staff {
 
     }
 
+    /**
+     * Permet d'afficher une fenêtre pour afficher toutes les tables, leurs états et de pouvoir les débarasser
+     * @param lbl
+     * @return
+     */
     public BasicWindow DebarasserTable(Label lbl) {
         Panel panel = super.deconnection();
         Label lblOutput = lbl;
