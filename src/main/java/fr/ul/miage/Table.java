@@ -3,13 +3,15 @@ package fr.ul.miage;
 import org.bson.types.ObjectId;
 
 public class Table {
+    private ObjectId _id;
     private int numero;
     private int etage;
     private String etat;
     //private Order listOrder;
     private int nbCouvert;
 
-    public Table(int numero, int etage, String etat, int nbCouvert) {
+    public Table(ObjectId _id, int numero, int etage, String etat, int nbCouvert) {
+        this._id = _id;
         this.numero = numero;
         this.etage = etage;
         this.etat = etat;
@@ -46,5 +48,13 @@ public class Table {
 
     public void setNbCouvert(int nbCouvert) {
         this.nbCouvert = nbCouvert;
+    }
+
+    public ObjectId get_id() {
+        return _id;
+    }
+
+    public void set_id(ObjectId _id) {
+        this._id = _id;
     }
 }

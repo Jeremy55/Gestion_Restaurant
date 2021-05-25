@@ -8,6 +8,7 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.*;
 import static com.mongodb.client.model.Filters.*;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -35,9 +36,17 @@ public class DBQueries {
         String role = staff.get("role").toString();
         switch (role){
             case "cuisinier":
-                return gson.fromJson(staff.toJson(), Cook.class);
+                Cook u = gson.fromJson(staff.toJson(), Cook.class);
+                u.setId(staff.getObjectId("_id"));
+                return u;
             case "assistant de service":
-                return gson.fromJson(staff.toJson(), ServiceAssistant.class);
+                ServiceAssistant v = gson.fromJson(staff.toJson(), ServiceAssistant.class);
+                v.setId(staff.getObjectId("_id"));
+                return v;
+            case "maitre d'hotel":
+                Butler b = gson.fromJson(staff.toJson(), Butler.class);
+                b.setId(staff.getObjectId("_id"));
+                return b;
             default:
                 return null;
         }
@@ -50,17 +59,18 @@ public class DBQueries {
 
         List<Table> tables = new ArrayList<Table>();
         for(Document doc : table){
-            tables.add(gson.fromJson(doc.toJson(),Table.class));
+            Table a = gson.fromJson(doc.toJson(),Table.class);
+            a.set_id(doc.getObjectId("_id"));
+            tables.add(a);
         }
 
         return tables;
     }
 
-    public void updateTableLibre(int numero, int etage){
+    public void updateTableLibre(ObjectId id){
         MongoCollection<Document> collectionTable = database.getCollection("Table");
-        Document query = new Document().append("numero", numero).append("etage", etage);
-        Document table = collectionTable.find(and(eq("numero", numero), eq("etage", etage))).first();
-
+        Document query = new Document().append("_id", id);
+        Document table = collectionTable.find(eq("_id", id)).first();
 
         Document setData = new Document();
         setData.append("etat", "libre");
@@ -69,8 +79,80 @@ public class DBQueries {
         update.append("$set", setData);
 
         collectionTable.updateOne(query, update);
+    }
 
+    public List<Waiter> getServeurAffecte(Table t){
+        MongoCollection<Document> collectionPersonnel = database.getCollection("Personnel");
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        FindIterable<Document> serveur =  collectionPersonnel.find(eq("role", "serveur"));
 
+        List<Waiter> serveurs = new ArrayList<Waiter>();
+        for(Document doc : serveur){
+            Waiter waiter = gson.fromJson(doc.toJson(),Waiter.class);
+            if(doc.get("Table") != null){
+                waiter.setTable((List<ObjectId>) doc.get("Table"));
+            }
+            else{
+                waiter.setTable(new ArrayList<ObjectId>());
+            }
+
+            serveurs.add(waiter);
+        }
+
+        List<Waiter> serveursTable = new ArrayList<Waiter>();
+        for(Waiter a : serveurs){
+            //System.out.println(a.getTable());
+            if(a.getTable().contains(t.get_id())){
+                serveursTable.add(a);
+            }
+        }
+        return serveursTable;
+    }
+
+    public List<Waiter> getServeurNonAffecte(Table t){
+        MongoCollection<Document> collectionPersonnel = database.getCollection("Personnel");
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        FindIterable<Document> serveur =  collectionPersonnel.find(eq("role", "serveur"));
+
+        List<Waiter> serveurs = new ArrayList<Waiter>();
+        for(Document doc : serveur){
+            Waiter waiter = gson.fromJson(doc.toJson(),Waiter.class);
+            if(doc.get("Table") != null){
+                waiter.setTable((List<ObjectId>) doc.get("Table"));
+            }
+            else{
+                waiter.setTable(new ArrayList<ObjectId>());
+            }
+            serveurs.add(waiter);
+        }
+
+        List<Waiter> serveursTable = new ArrayList<Waiter>();
+        for(Waiter a : serveurs){
+            if(!a.getTable().contains(t.get_id())){
+                serveursTable.add(a);
+            }
+        }
+        return serveursTable;
+    }
+
+    public void AffecteServeurTable(Table table, Waiter serveur){
+        MongoCollection<Document> collectionPersonnel = database.getCollection("Personnel");
+        Document query = new Document().append("login", serveur.getLogin());
+        Document tableServeur = collectionPersonnel.find(eq("login", serveur.getLogin())).first();
+
+        List tableExistante = (List) tableServeur.get("Table");
+        if(tableExistante == null){
+            tableExistante = new ArrayList();
+        }
+        tableExistante.add(table.get_id());
+
+        Document setData = new Document();
+        setData.append("Table", tableExistante);
+
+        Document update = new Document();
+        update.append("$set", setData);
+
+        collectionPersonnel.updateOne(query, update);
     }
 
 

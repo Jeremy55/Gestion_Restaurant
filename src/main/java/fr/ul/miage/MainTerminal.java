@@ -15,6 +15,7 @@ public class MainTerminal {
     private MultiWindowTextGUI gui;
     private final BasicWindow currentWindow;
 
+
     private MainTerminal(BasicWindow window) throws IOException {
         // Create gui and start gui
         setup();
