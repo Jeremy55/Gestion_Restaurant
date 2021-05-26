@@ -5,8 +5,9 @@ import com.googlecode.lanterna.gui2.*;
 import org.bson.types.ObjectId;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.regex.Pattern;
 
 
@@ -43,13 +44,14 @@ public class Cook extends Staff {
         }
     }
 
-    public class Preparation{
+    public class Preparation implements Comparable<Preparation>{
         ObjectId _id;
         String heureCommande;
         Boolean debut;
         String fin;
         ObjectId Plat;
         Boolean menuEnfant;
+        Date trueDate;
 
         public Preparation(ObjectId _id, String heureCommande, Boolean debut, ObjectId plat, Boolean menuEnfant) {
             this._id = _id;
@@ -78,6 +80,11 @@ public class Cook extends Staff {
                     ", Plat=" + Plat +
                     ", menuEnfant=" + menuEnfant +
                     '}';
+        }
+
+        @Override
+        public int compareTo(Preparation o) {
+            return trueDate.compareTo(o.trueDate);
         }
     }
 
@@ -137,10 +144,25 @@ public class Cook extends Staff {
      */
     private Panel panelBackLogPreparations(){
         Panel panel = new Panel();
-        for(Preparation p : getDbQueries().getPreparations()){
+        ArrayList<Preparation> sortedPreparations = orderPreparation(getDbQueries().getPreparations());
+        for(Preparation p : sortedPreparations){
             buttonStartPreparation(p).addTo(panel);
         }
         return panel;
+    }
+
+    private ArrayList<Preparation> orderPreparation(ArrayList<Preparation> preparations){
+        // Transformation des string en vrai format Date.
+        for(Preparation p : preparations){
+            try {
+                p.trueDate = new SimpleDateFormat("dd-M-yyy hh:mm:ss").parse(p.heureCommande);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+        Collections.sort(preparations);
+        Collections.reverse(preparations);
+        return preparations;
     }
 
     /**
