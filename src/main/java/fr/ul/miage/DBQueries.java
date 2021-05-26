@@ -79,13 +79,13 @@ public class DBQueries {
         collection.insertOne(plat);
     }
 
-    public ArrayList<Cook.Preparation> getPreparations(){
+    public ArrayList<Preparation> getPreparations(){
         MongoCollection<Document> collection = database.getCollection("Preparation");
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         FindIterable<Document>  preparationsDoc = collection.find(eq("debut", false));
-        ArrayList<Cook.Preparation> preparations = new ArrayList<>();
+        ArrayList<Preparation> preparations = new ArrayList<>();
         for(Document d : preparationsDoc ){
-            Cook.Preparation preparation = gson.fromJson(d.toJson(), Cook.Preparation.class);
+            Preparation preparation = gson.fromJson(d.toJson(), Preparation.class);
             preparation.Plat = d.getObjectId("Plat");
             preparation._id = d.getObjectId("_id");
             preparations.add(preparation);
@@ -102,7 +102,7 @@ public class DBQueries {
         return plat;
     }
 
-    public void updatePreparation(Cook.Preparation preparation){
+    public void updatePreparation(Preparation preparation){
         MongoCollection<Document> collection = database.getCollection("Preparation");
         Document query = new Document().append("_id",preparation._id);
         Document setData = new Document();
