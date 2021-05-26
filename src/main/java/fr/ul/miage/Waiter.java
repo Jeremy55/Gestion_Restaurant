@@ -2,9 +2,17 @@ package fr.ul.miage;
 
 import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TextColor;
+import com.googlecode.lanterna.graphics.SimpleTheme;
 import com.googlecode.lanterna.gui2.*;
+import com.googlecode.lanterna.gui2.Button;
+import com.googlecode.lanterna.gui2.GridLayout;
+import com.googlecode.lanterna.gui2.Label;
+import com.googlecode.lanterna.gui2.Panel;
 import org.bson.types.ObjectId;
+import org.w3c.dom.Text;
 
+import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,27 +28,32 @@ public class Waiter extends Staff {
     @Override
     public void Screen(){
         Panel panel = super.deconnection();
-        panel.setLayoutManager(new GridLayout(1));
+        panel.setLayoutManager(new GridLayout(2));
         panel.addComponent(new EmptySpace(new TerminalSize(0, 0)));
         //panel.addComponent(new Label("Menu serveur").setPosition(new TerminalPosition(1)));
         panel.addComponent(new Label("Menu serveur"));
-
+        panel.addComponent(new EmptySpace());
         List<Integer> listEtages = getFloors(getDbQueries().getWaiterTables(this));
         List<Table> listTables = getDbQueries().getWaiterTables(this);
 
         for (Integer etage :listEtages) {
             panel.addComponent(new Label("Etage n°" + etage.intValue() + " :"));
+            panel.addComponent(new EmptySpace());
             for (Table t : listTables) {
                 if(etage.intValue() == t.getEtage()) {
                     String str = "Table n°" + t.getNumero() + " | Etat : " + t.getEtat();
-                    new Button(str, new Runnable() {
+                    Label lbl = setColorStates(t,new Label(str));
+                    panel.addComponent(lbl);
+                    new Button("Consulter", new Runnable() {
                         @Override
                         public void run() {
-
+                            screenInfosTable(t);
                         }
                     }).addTo(panel);
+
                 }
             }
+            panel.addComponent(new EmptySpace());
             panel.addComponent(new EmptySpace());
         }
 
@@ -75,6 +88,103 @@ public class Waiter extends Staff {
     public void setTable(List<ObjectId> table) {
         Table = table;
     }
+
+
+    /**
+     * Retourne un label colorisé en fonction d'un état
+     * @param table
+     * @param lbl
+     * @return lbl (type Label)
+     */
+    public Label setColorStates(Table table, Label lbl){
+        switch (table.getEtat()){
+            case "libre":
+                lbl.setBackgroundColor(TextColor.ANSI.GREEN);
+                break;
+            case "occupé":
+                lbl.setBackgroundColor(TextColor.ANSI.YELLOW_BRIGHT);
+                break;
+            case "a débarassée":
+                lbl.setBackgroundColor(TextColor.ANSI.RED_BRIGHT);
+                break;
+            case "réservé":
+                lbl.setBackgroundColor(new TextColor.RGB(255,127,0));
+                break;
+        }
+        return lbl;
+    }
+
+
+    /**
+     * Affiche la fenêtre terminale des informations sur une table
+     * @param table
+     */
+    public void screenInfosTable(Table table){
+        Panel panel = super.deconnection();
+        panel.addComponent(new EmptySpace());
+
+        panel.addComponent(new Label(table.toString()));
+
+        new Button("Retour", new Runnable() {
+            @Override
+            public void run() {
+                orderEntryScreen(table);
+            }
+        }).addTo(panel);
+
+        panel.addComponent(new EmptySpace());
+
+        new Button("Retour", new Runnable() {
+            @Override
+            public void run() {
+                Screen();
+            }
+        }).addTo(panel);
+        BasicWindow window = new BasicWindow();
+        window.setComponent(panel);
+        try {
+            MainTerminal.getConsole().switchWindow(window);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    /**
+     * Affiche la fenêtre terminale de la commande courante à une table donné
+     * @param table (type Table)
+     */
+    public void orderEntryScreen(Table table){
+        Panel panel = super.deconnection();
+        panel.addComponent(new EmptySpace());
+
+        panel.addComponent(new Label("Commande : "));
+
+
+        panel.addComponent(new EmptySpace());
+
+        new Button("Retour", new Runnable() {
+            @Override
+            public void run() {
+                Screen();
+            }
+        }).addTo(panel);
+        new Button("Retour", new Runnable() {
+            @Override
+            public void run() {
+                Screen();
+            }
+        }).addTo(panel);
+        BasicWindow window = new BasicWindow();
+        window.setComponent(panel);
+        try {
+            MainTerminal.getConsole().switchWindow(window);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 }
 
 

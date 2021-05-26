@@ -65,6 +65,11 @@ public class DBQueries {
         return tables;
     }
 
+    /**
+     * Recupère les tables du serveur demandé et parsing Json vers Objet
+     * @param waiter
+     * @return tables
+     */
     public List<Table> getWaiterTables(Waiter waiter){
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
@@ -86,6 +91,11 @@ public class DBQueries {
         }
 
         return tables ;
+    }
+
+
+    public void g(){
+
     }
 
 }
