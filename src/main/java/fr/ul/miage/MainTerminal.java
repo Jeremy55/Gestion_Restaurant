@@ -45,6 +45,7 @@ public class MainTerminal {
         gui.addWindowAndWait(window);
     }
 
+
     public void start(){
         gui.addWindowAndWait(currentWindow);
     }

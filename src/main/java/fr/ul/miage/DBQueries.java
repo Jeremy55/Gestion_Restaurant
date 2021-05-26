@@ -57,6 +57,12 @@ public class DBQueries {
                 Director d = gson.fromJson(staff.toJson(), Director.class);
                 d.setId(staff.getObjectId("_id"));
                 return d;
+            case "serveur":
+                Waiter s = gson.fromJson(staff.toJson(), Waiter.class);
+                s.setId(staff.getObjectId("_id"));
+                List l = (List) staff.get("Table");
+                s.setTable(l);
+                return s;
             default:
                 return null;
         }
@@ -145,8 +151,35 @@ public class DBQueries {
             a.set_id(doc.getObjectId("_id"));
             tables.add(a);
         }
-
         return tables;
+    }
+
+    /**
+     * Recupère les tables du serveur demandé et parsing Json vers Objet
+     * @param waiter
+     * @return tables
+     */
+    public List<Table> getWaiterTables(Waiter waiter){
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+        //On récupère la collection de tables
+        MongoCollection<Document> collectionTable = database.getCollection("Table");
+        List<Document> listTables = new ArrayList<Document>();
+
+        for (ObjectId t: waiter.getTable()) {
+            Document d = collectionTable.find(eq("_id",t)).first();
+            listTables.add(d);
+        }
+
+        List<Table> tables = new ArrayList<Table>();
+
+        for(Document doc : listTables){
+            Table t = gson.fromJson(doc.toJson(),Table.class);
+            t.set_id(doc.getObjectId("_id"));
+            tables.add(t);
+        }
+
+        return tables ;
     }
 
     /**
@@ -282,6 +315,5 @@ public class DBQueries {
         }
         collectionPersonnel.insertOne(personnel);
     }
-
 
 }
