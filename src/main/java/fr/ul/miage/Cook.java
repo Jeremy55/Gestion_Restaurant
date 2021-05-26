@@ -13,7 +13,7 @@ public class Cook extends Staff {
     }
 
     @Override
-    public void Screen(){
+    public void screen(){
         Panel panel = super.deconnection();
         panel.setLayoutManager(new GridLayout(2));
         panel.addComponent(new EmptySpace(new TerminalSize(0, 0)));

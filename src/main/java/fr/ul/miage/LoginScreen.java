@@ -37,7 +37,7 @@ public class LoginScreen extends BasicWindow {
                     Staff a = dbQueries.getStaff(username.getText());
                     a.setDbQueries(dbQueries);
                     try {
-                        a.Screen();
+                        a.screen();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }

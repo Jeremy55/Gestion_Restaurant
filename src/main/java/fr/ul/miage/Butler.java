@@ -16,7 +16,7 @@ public class Butler extends Staff {
     }
 
     @Override
-    public void Screen() throws IOException {
+    public void screen() throws IOException {
         MainTerminal.getConsole().switchWindow(AffichageTable(new Label("")));
     }
 
@@ -38,7 +38,7 @@ public class Butler extends Staff {
         panel.addComponent(new EmptySpace(new TerminalSize(0, 0)));
         List<Table> table = getDbQueries().getAllTable();
         for(Table e : table){
-                new Button("  - Table n° " + e.getNumero() + " a l'étage " + e.getEtage(), new Runnable() {
+                new Button("  - Table n°" + e.getNumero() + " a l'étage " + e.getEtage(), new Runnable() {
                     @Override
                     public void run() {
                         try {
@@ -68,7 +68,9 @@ public class Butler extends Staff {
      */
     public BasicWindow AssignerServeur(Table e, Label lb){
         Panel panel = super.deconnection();
+        panel.setLayoutManager(new GridLayout(2));
         Label lblOutput = lb;
+        panel.addComponent(new EmptySpace());
         new Button("Retour en arrière", new Runnable() {
             @Override
             public void run() {
@@ -79,22 +81,25 @@ public class Butler extends Staff {
                 }
             }
         }).addTo(panel);
-        panel.setLayoutManager(new GridLayout(1));
+        panel.addComponent(new EmptySpace());
         panel.addComponent(lblOutput.setBackgroundColor(TextColor.ANSI.GREEN));
-        panel.addComponent(new EmptySpace(new TerminalSize(0, 0)));
-        panel.addComponent(new Label("Liste des serveurs affectés à la table n° " + e.getNumero() + " : " ));
-        panel.addComponent(new EmptySpace(new TerminalSize(0, 0)));
+        panel.addComponent(new EmptySpace());
+        panel.addComponent(new Label("Table n°"+e.getNumero() + ", étage " + e.getEtage()));
+        panel.addComponent(new EmptySpace());
+        panel.addComponent(new Label("Serveurs affectés : " ));
+        panel.addComponent(new EmptySpace());
         List<Waiter> serveursAffectes = getDbQueries().getServeurAffecte(e);
         for(Waiter w : serveursAffectes){
-            panel.addComponent(new Label ( "\t - " + w.getNom() + " " + w.getPrenom()));
-            panel.addComponent(new EmptySpace(new TerminalSize(0, 0)));
+            panel.addComponent(new Label ( "  - " + w.getNom() + " " + w.getPrenom()));
+            panel.addComponent(new EmptySpace());
         }
-        panel.addComponent(new Label(""));
-        panel.addComponent(new Label("Liste des serveurs non affectés à cette table : "));
+        panel.addComponent(new EmptySpace());
+        panel.addComponent(new EmptySpace());
+        panel.addComponent(new Label("Serveurs non affectés : "));
+        panel.addComponent(new EmptySpace());
         List<Waiter> serveursNonAffectes = getDbQueries().getServeurNonAffecte(e);
         for(Waiter w : serveursNonAffectes){
-            panel.addComponent(new Label ( "\t - " + w.getNom() + " " + w.getPrenom()));
-            panel.addComponent(new EmptySpace(new TerminalSize(0, 0)));
+            panel.addComponent(new Label ( "  - " + w.getNom() + " " + w.getPrenom()));
             new Button("Affecter le serveur " + w.getNom() + " " + w.getPrenom(), new Runnable() {
                 @Override
                 public void run() {
