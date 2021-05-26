@@ -31,35 +31,21 @@ public class Table {
 
     public void setNumero(int number) { this.numero = numero; }
 
-    public int getEtage() {
-        return etage;
-    }
+    public int getEtage() { return etage; }
 
-    public void setEtage(int etage) {
-        this.etage = etage;
-    }
+    public void setEtage(int etage) { this.etage = etage; }
 
-    public String getEtat() {
-        return etat;
-    }
+    public String getEtat() { return etat; }
 
-    public void setEtat(String etat) {
-        this.etat = etat;
-    }
+    public void setEtat(String etat) { this.etat = etat; }
 
-    public int getNbCouvert() {
-        return nbCouvert;
-    }
+    public int getNbCouvert() { return nbCouvert; }
 
-    public void setNbCouvert(int nbCouvert) {
-        this.nbCouvert = nbCouvert;
-    }
+    public void setNbCouvert(int nbCouvert) { this.nbCouvert = nbCouvert; }
 
-    public String getInfosTable(){
-        return null;
+    public Order getOrder() { return order; }
 
-    }
-
+    public void setOrder(Order order) { this.order = order; }
 
     @Override
     public String toString() {

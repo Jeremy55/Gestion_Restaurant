@@ -94,8 +94,12 @@ public class DBQueries {
     }
 
 
-    public void g(){
-
+    public Order getCommandeFromTable(Table table){
+        MongoCollection<Document> collectionPersonnel = database.getCollection("Table");
+        if(table.getOrder() == null){
+           // table.setOrder(new Order());
+        }
+        return null;
     }
 
 }

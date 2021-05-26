@@ -25,6 +25,14 @@ public class Waiter extends Staff {
         Table = new ArrayList<ObjectId>();
     }
 
+    public List<ObjectId> getTable() {
+        return Table;
+    }
+
+    public void setTable(List<ObjectId> table) {
+        Table = table;
+    }
+
     @Override
     public void Screen(){
         Panel panel = super.deconnection();
@@ -66,6 +74,7 @@ public class Waiter extends Staff {
         }
     }
 
+
     /**
      * Récupère une liste d'entier en fonction du nombre d'étages existant.
      * @param lTable
@@ -79,14 +88,6 @@ public class Waiter extends Staff {
             }
         }
         return lEtage;
-    }
-
-    public List<ObjectId> getTable() {
-        return Table;
-    }
-
-    public void setTable(List<ObjectId> table) {
-        Table = table;
     }
 
 
@@ -122,17 +123,7 @@ public class Waiter extends Staff {
     public void screenInfosTable(Table table){
         Panel panel = super.deconnection();
         panel.addComponent(new EmptySpace());
-
         panel.addComponent(new Label(table.toString()));
-
-        new Button("Retour", new Runnable() {
-            @Override
-            public void run() {
-                orderEntryScreen(table);
-            }
-        }).addTo(panel);
-
-        panel.addComponent(new EmptySpace());
 
         new Button("Retour", new Runnable() {
             @Override
@@ -140,6 +131,18 @@ public class Waiter extends Staff {
                 Screen();
             }
         }).addTo(panel);
+
+        if (table.getEtat().equals("occupé")) {
+            new Button("Ajouter plat", new Runnable() {
+                @Override
+                public void run() {
+                    orderEntryScreen(table);
+                }
+            }).addTo(panel);
+        }
+
+        panel.addComponent(new EmptySpace());
+
         BasicWindow window = new BasicWindow();
         window.setComponent(panel);
         try {
@@ -150,29 +153,31 @@ public class Waiter extends Staff {
     }
 
 
+
     /**
      * Affiche la fenêtre terminale de la commande courante à une table donné
      * @param table (type Table)
      */
     public void orderEntryScreen(Table table){
-        Panel panel = super.deconnection();
+        Panel panel = new Panel();
+        panel.setLayoutManager(new GridLayout(1));
+
         panel.addComponent(new EmptySpace());
 
-        panel.addComponent(new Label("Commande : "));
-
+        panel.addComponent(new Label("Commande : " + table.getOrder().get_id()));
 
         panel.addComponent(new EmptySpace());
 
         new Button("Retour", new Runnable() {
             @Override
             public void run() {
-                Screen();
+                screenInfosTable(table);
             }
         }).addTo(panel);
-        new Button("Retour", new Runnable() {
+        new Button("Valider ajout", new Runnable() {
             @Override
             public void run() {
-                Screen();
+                orderEntryScreen(table);
             }
         }).addTo(panel);
         BasicWindow window = new BasicWindow();
