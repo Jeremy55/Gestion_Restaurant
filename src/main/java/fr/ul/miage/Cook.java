@@ -6,6 +6,7 @@ import org.bson.types.ObjectId;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.regex.Pattern;
 
 
@@ -118,16 +119,62 @@ public class Cook extends Staff {
         }
     }
 
+    /**
+     * @return bouton qui redirige vers la page des préparations.
+     */
     private Button buttonBackLogPreparations(){
         return new Button("Voir les plats à preparer", new Runnable() {
             @Override
             public void run(){
-                Panel panel = new Panel();
-                for(Preparation p : getDbQueries().getPreparations()){
-                    System.out.println(p.Plat);
-                    System.out.println(getDbQueries().getPlat(p.Plat));
-                }
-                setupWindowAndSwitch(panel,"Plat à préparer");
+                setupWindowAndSwitch(panelBackLogPreparations(),"Plat à préparer");
+            }
+        });
+    }
+
+    /**
+     * Affiche toutes les préparations à faire sous forme de bouton.
+     * @return
+     */
+    private Panel panelBackLogPreparations(){
+        Panel panel = new Panel();
+        for(Preparation p : getDbQueries().getPreparations()){
+            buttonStartPreparation(p).addTo(panel);
+        }
+        return panel;
+    }
+
+    /**
+     * Bouton lié à une préparation, permet de démarrer la préparation quand actionné.
+     * @param preparation
+     * @return Bouton lié à une préparation.
+     */
+    private Button buttonStartPreparation(Preparation preparation){
+        Plat plat = getDbQueries().getPlat(preparation.Plat);
+        return new Button(plat.nom, new Runnable() {
+            @Override
+            public void run() {
+                setupWindowAndSwitch(panelStartPreparation(plat,preparation),"Préparation d'un plat");
+            }
+        });
+    }
+
+    private Panel panelStartPreparation(Plat plat, Preparation preparation){
+        getDbQueries().updatePreparation(preparation);
+        Panel panel = new Panel();
+        panel.addComponent(new Label(plat.nom));
+        panel.addComponent(new Label("Composition :"));
+        panel.addComponent(new Label(plat.Ingredient.toString()));
+        buttonFinishPreparation(preparation).addTo(panel);
+        return panel;
+    }
+
+    private Button buttonFinishPreparation(Preparation p){
+        return new Button("Préparation terminée", new Runnable() {
+            @Override
+            public void run() {
+                p.fin = new Date().toString();
+                getDbQueries().updatePreparation(p);
+                setupWindowAndSwitch(panelBackLogPreparations(),"Plat restant");
             }
         });
     }

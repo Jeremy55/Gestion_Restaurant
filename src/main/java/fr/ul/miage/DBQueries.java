@@ -15,6 +15,7 @@ import org.bson.types.ObjectId;
 import javax.print.Doc;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class DBQueries {
@@ -84,7 +85,6 @@ public class DBQueries {
         FindIterable<Document>  preparationsDoc = collection.find(eq("debut", false));
         ArrayList<Cook.Preparation> preparations = new ArrayList<>();
         for(Document d : preparationsDoc ){
-            System.out.println(d.toJson().toString());
             Cook.Preparation preparation = gson.fromJson(d.toJson(), Cook.Preparation.class);
             preparation.Plat = d.getObjectId("Plat");
             preparation._id = d.getObjectId("_id");
@@ -102,4 +102,16 @@ public class DBQueries {
         return plat;
     }
 
+    public void updatePreparation(Cook.Preparation preparation){
+        MongoCollection<Document> collection = database.getCollection("Preparation");
+        Document query = new Document().append("_id",preparation._id);
+        Document setData = new Document();
+        if(!(preparation.fin == null)){
+            setData.append("fin", preparation.fin);
+        }
+        setData.append("debut",true);
+        Document update = new Document();
+        update.append("$set",setData);
+        collection.updateOne(query,update);
+    }
 }
