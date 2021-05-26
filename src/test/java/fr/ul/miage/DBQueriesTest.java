@@ -84,6 +84,22 @@ public class DBQueriesTest {
         assertNotNull(serveurs);
     }
 
+    @Test
+    void getIngredients(){
+        List<Ingredient> ingredients = dbQueries.getIngredients();
+        assertNotNull(ingredients);
+    }
+
+    @Test
+    void getCategories(){
+        List<Categorie> categories = dbQueries.getCategories();
+        assertNotNull(categories);
+    }
+
+
+
+
+
 
 
 

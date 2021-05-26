@@ -100,14 +100,14 @@ public class Cook extends Staff {
      */
     private Panel panelBackLogPreparations(){
         Panel panel = new Panel();
-        ArrayList<Preparation> sortedPreparations = orderPreparation(getDbQueries().getPreparations());
+        ArrayList<Preparation> sortedPreparations = orderPreparations(getDbQueries().getPreparations());
         for(Preparation p : sortedPreparations){
             buttonStartPreparation(p).addTo(panel);
         }
         return panel;
     }
 
-    private ArrayList<Preparation> orderPreparation(ArrayList<Preparation> preparations){
+    public ArrayList<Preparation> orderPreparations(ArrayList<Preparation> preparations){
         // Etape 1 : Tranformation des string qui representent les dates en date réelle.
         for(Preparation p : preparations){
             try {
@@ -118,8 +118,6 @@ public class Cook extends Staff {
         }
         // Etape 2 : Tri par rapport au date ( voir la classe preparation )
         Collections.sort(preparations);
-        // Etape 3 : Inversion de la liste ( Pour avoir les plus récents au début ).
-        Collections.reverse(preparations);
         // Etape 4 : On récupère les menus enfants.
         ArrayList<Preparation> preparationsEnfans = new ArrayList<Preparation>();
         for(Preparation p : preparations){
