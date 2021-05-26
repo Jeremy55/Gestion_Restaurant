@@ -152,7 +152,7 @@ public class Cook extends Staff {
     }
 
     private ArrayList<Preparation> orderPreparation(ArrayList<Preparation> preparations){
-        // Transformation des string en vrai format Date.
+        // Etape 1 : Tranformation des string qui representent les dates en date réelle.
         for(Preparation p : preparations){
             try {
                 p.trueDate = new SimpleDateFormat("dd-M-yyy hh:mm:ss").parse(p.heureCommande);
@@ -160,8 +160,23 @@ public class Cook extends Staff {
                 e.printStackTrace();
             }
         }
+        // Etape 2 : Tri par rapport au date ( voir la classe preparation )
         Collections.sort(preparations);
+        // Etape 3 : Inversion de la liste ( Pour avoir les plus récents au début ).
         Collections.reverse(preparations);
+        // Etape 4 : On récupère les menus enfants.
+        ArrayList<Preparation> preparationsEnfans = new ArrayList<Preparation>();
+        for(Preparation p : preparations){
+            if(p.menuEnfant){
+                preparationsEnfans.add(p);
+            }
+
+        }
+        // Etape 5 : On retire les menus enfants pour les rajouter en tête de liste.
+        preparations.removeAll(preparationsEnfans);
+        Collections.sort(preparationsEnfans);
+        preparations.addAll(0,preparationsEnfans);
+
         return preparations;
     }
 
