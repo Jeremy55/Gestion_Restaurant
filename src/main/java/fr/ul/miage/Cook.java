@@ -46,8 +46,8 @@ public class Cook extends Staff {
 
     private String message;
 
-    public Cook(ObjectId id, String login, String mdp, String nom, String prenom) {
-        super(id, login, mdp, nom, prenom);
+    public Cook( String login, String mdp, String nom, String prenom) {
+        super( login, mdp, nom, prenom);
     }
 
     /**

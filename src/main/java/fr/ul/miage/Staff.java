@@ -15,8 +15,7 @@ public abstract class Staff {
     private String prenom;
     private DBQueries dbQueries;
 
-    public Staff(ObjectId id, String login, String mdp, String nom, String prenom) {
-        this._id = id;
+    public Staff(String login, String mdp, String nom, String prenom) {
         this.login = login;
         this.mdp = mdp;
         this.nom = nom;
@@ -72,15 +71,15 @@ public abstract class Staff {
         return dbQueries;
     }
 
-    abstract void screen();
+    abstract void screen() throws IOException;
 
     protected Panel deconnection(){
         Panel panel = new Panel();
         new Button("Déconnection", new Runnable() {
             @Override
             public void run() {
-                LoginScreen loginScreen = new LoginScreen();
                 try {
+                    LoginScreen loginScreen = new LoginScreen();
                     MainTerminal.getConsole().switchWindow(loginScreen);
                 } catch (IOException e) {
                     e.printStackTrace();
