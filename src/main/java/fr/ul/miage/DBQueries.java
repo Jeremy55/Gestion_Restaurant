@@ -53,6 +53,10 @@ public class DBQueries {
                 Butler b = gson.fromJson(staff.toJson(), Butler.class);
                 b.setId(staff.getObjectId("_id"));
                 return b;
+            case "directeur":
+                Director d = gson.fromJson(staff.toJson(), Director.class);
+                d.setId(staff.getObjectId("_id"));
+                return d;
             default:
                 return null;
         }
@@ -250,6 +254,33 @@ public class DBQueries {
         update.append("$set", setData);
 
         collectionPersonnel.updateOne(query, update);
+    }
+
+    /**
+     * Ajouter un nouvel employé dans la BDD
+     * @param login
+     * @param mdp
+     * @param nom
+     * @param prenom
+     * @param role
+     * @param tables
+     */
+    public void addStaff(String login, String mdp, String nom, String prenom, String role, List<Table> tables){
+        MongoCollection<Document> collectionPersonnel = database.getCollection("Personnel");
+        Document personnel = new Document("_id",new ObjectId());
+        personnel.append("login",login)
+                .append("mdp",mdp)
+                .append("role",role)
+                .append("nom",nom)
+                .append("prenom",prenom);
+        List tableID = new ArrayList();
+        if(role.equals("serveur")){
+            for(Table i : tables){
+                tableID.add(i.get_id());
+            }
+            personnel.append("Table", tableID);
+        }
+        collectionPersonnel.insertOne(personnel);
     }
 
 
