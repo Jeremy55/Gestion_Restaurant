@@ -58,6 +58,7 @@ public class Cook extends Staff {
         Panel panel = super.deconnection();
         buttonAddRecipe().addTo(panel);
         buttonBackLogPreparations().addTo(panel);
+        buttonSeeIngredientsStock().addTo(panel);
         if(!(message == null)){
             panel.addComponent(new Label(message));
             message = null;
@@ -92,6 +93,44 @@ public class Cook extends Staff {
                 setupWindowAndSwitch(panelBackLogPreparations(),"Plat à préparer");
             }
         });
+    }
+
+
+
+    private Button buttonSeeIngredientsStock(){
+        return new Button("Voir les Stocks d'ingrédients", new Runnable() {
+            @Override
+            public void run(){
+                setupWindowAndSwitch(panelIngredientsStock(),"Ingrédients en stock");
+            }
+        });
+    }
+
+    public  void test(){
+        setupWindowAndSwitch(panelIngredientsStock(),"Ingrédients en stock");
+    }
+
+    private Panel panelIngredientsStock(){
+        Panel panel = new Panel();
+        Timer timer = new Timer();
+
+        buttonReturnMainmenu(timer).addTo(panel);
+
+        Panel panelIngredients = new Panel();
+
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                panelIngredients.removeAllComponents();
+                ArrayList<Ingredient> ingredients = getDbQueries().getIngredients();
+                for (Ingredient i : ingredients){
+                    panelIngredients.addComponent(new Label(i.nom + " : " + i.stock));
+                }
+            }
+        }, 0, 2000);
+
+        panel.addComponent(panelIngredients);
+        return panel;
     }
 
     /**
@@ -225,6 +264,16 @@ public class Cook extends Staff {
         return new Button("Retour au menu", new Runnable() {
             @Override
             public void run() {
+                screen();
+            }
+        });
+    }
+
+    private Button buttonReturnMainmenu(Timer timer){
+        return new Button("Retour au menu", new Runnable() {
+            @Override
+            public void run() {
+                timer.cancel();
                 screen();
             }
         });
