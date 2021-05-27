@@ -100,6 +100,7 @@ public class Cook extends Staff {
      */
     private Panel panelBackLogPreparations(){
         Panel panel = new Panel();
+        buttonReturnMainmenu().addTo(panel);
         ArrayList<Preparation> sortedPreparations = orderPreparations(getDbQueries().getPreparations());
         for(Preparation p : sortedPreparations){
             buttonStartPreparation(p).addTo(panel);
@@ -189,7 +190,6 @@ public class Cook extends Staff {
                 buttonAddIngredient(panel,ingredientsList).addTo(panel); // Bouton qui permet d'ajouter d'autre comboBox contenant des ingrédients dans la console.
                 ingredientsList.add(ingredientComboBox());// ComboBox contenant les ingrédients disponibles dans la BDD.
                 ingredientsList.get(0).addTo(panel); // Ajoute la ComboBox dans l'interface.
-                setupWindowAndSwitch(panel,"Plat à ajouter");
             }
         });
     }
