@@ -159,14 +159,30 @@ public class Waiter extends Staff {
      * @param table (type Table)
      */
     public void orderEntryScreen(Table table){
+        ArrayList<ComboBox<String>> ingredientsList = new ArrayList<>();
         Panel panel = new Panel();
         panel.setLayoutManager(new GridLayout(1));
 
         panel.addComponent(new EmptySpace());
 
-        panel.addComponent(new Label("Commande : " + table.getOrder().get_id()));
+        panel.addComponent(new Label("Commande : "));
 
+        //On récupère pas la commande pour le client
+        /*if(table.getOrder() != null){
+            for (Preparation p : table.getOrder().getPreparation()){
+                panel.addComponent(new Label(p.Plat));
+            }
+
+        else{
+            Order ord = new Order();
+        }
+        }*/
         panel.addComponent(new EmptySpace());
+
+        panel.addComponent(new Label("Catégorie du plat :"));
+        ComboBox<String>categories = categoriesComboBox().addTo(panel);
+
+
 
         new Button("Retour", new Runnable() {
             @Override
@@ -174,12 +190,23 @@ public class Waiter extends Staff {
                 screenInfosTable(table);
             }
         }).addTo(panel);
+
         new Button("Valider ajout", new Runnable() {
             @Override
             public void run() {
+               // getDbQueries().newPreparation();
                 orderEntryScreen(table);
             }
         }).addTo(panel);
+
+        new Button("Terminer commande", new Runnable() {
+            @Override
+            public void run() {
+                getDbQueries().updateOrder(table.getOrder());
+                Screen();
+            }
+        }).addTo(panel);
+
         BasicWindow window = new BasicWindow();
         window.setComponent(panel);
         try {
@@ -189,6 +216,15 @@ public class Waiter extends Staff {
         }
     }
 
+
+
+    private ComboBox<String> categoriesComboBox(){
+        ComboBox<String> categories = new ComboBox<String>();
+        for(Categorie c : super.getDbQueries().getCategories()){
+            categories.addItem(c.nom);
+        }
+        return categories;
+    }
 
 }
 

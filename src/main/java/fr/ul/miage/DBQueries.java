@@ -13,6 +13,8 @@ import org.bson.json.JsonObject;
 import org.bson.types.ObjectId;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -93,13 +95,124 @@ public class DBQueries {
         return tables ;
     }
 
+    /**
+     * Récupérer un document commande d'une table
+     * @param table
+     * @return commande
+     */
+    public Order getOrderFromTable(Table table){
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        MongoCollection<Document> collectionCommande = database.getCollection("Commande");
+        Document doc = collectionCommande.find(eq("_id",table)).first();
+        Order commande = gson.fromJson(doc.toJson(),Order.class);
+        commande.set_id(doc.getObjectId("_id"));
+        return commande;
+    }
 
-    public Order getCommandeFromTable(Table table){
-        MongoCollection<Document> collectionPersonnel = database.getCollection("Table");
-        if(table.getOrder() == null){
-           // table.setOrder(new Order());
+    /**
+     * Ajout un nouveau document préparation dans la base de donnée
+     * @param preparation
+     */
+    public void newPreparation(Preparation preparation){
+        MongoCollection<Document> collection = database.getCollection("Preparation");
+        Document prepa = new Document("_id",new ObjectId());
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd-MM-uuuu HH:mm:ss");
+        LocalDateTime localDateTime = LocalDateTime.now();
+        prepa.append("heureCommande", dtf.format(localDateTime))
+                .append("debut",false)
+                .append("Plat", preparation.Plat)
+                .append("menuEnfant", preparation.menuEnfant);
+        collection.insertOne(prepa);
+    }
+
+
+    /**
+     * Ajouter un nouveau document commande dans la base de donnée
+     */
+    public void newOrder(Order commmande){
+        MongoCollection<Document> collection = database.getCollection("Commande");
+        Document com = new Document("_id",new ObjectId());
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd-MM-uuuu HH:mm:ss");
+        LocalDateTime localDateTime = LocalDateTime.now();
+        com.append("dateDebut", dtf.format(localDateTime))
+                .append("debut",false)
+                .append("Preparation", commmande.getPreparation())
+                .append("montant", commmande.getMontant());
+        collection.insertOne(com);
+    }
+
+    /**
+     * Récupère la commande d'un document
+     */
+    public void getOrder(Table table){
+
+    }
+
+
+    /**
+     * Actualise
+     * @param commande
+     */
+    public void updateOrder(Order commande){
+        MongoCollection<Document> collection = database.getCollection("Commande");
+        Document com = new Document().append("_id",commande.get_id());
+        Document setData = new Document();
+        if(!(commande.getDateFin() == null)){
+            setData.append("dateFin", commande.getDateFin());
+        }
+        setData.append("Preparation", commande.getPreparation());
+        setData.append("montant", commande.getMontant());
+        Document update = new Document();
+        update.append("$set",setData);
+        collection.updateOne(com,update);
+    }
+
+/*
+    public ArrayList<Categorie> getCategoriesWithOneDishAvailable(){
+        MongoCollection<Document> collectionCat = database.getCollection("Categorie");
+        MongoCollection<Document> collectionPlat = database.getCollection("Plat");
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        FindIterable<Document>  cat = collectionCat.find();
+        FindIterable<Document>  platCat = collectionPlat.find();
+
+        ArrayList<Categorie> categories = new ArrayList<>();
+        for(Document docCat : cat){
+            for (Document docPlatCat: platCat) {
+                if (docPlatCat.get("Cat")){
+
+                }
+            }
+            categories.add(gson.fromJson(d.toJson(), Categorie.class));
         }
         return null;
+    }
+
+    public ArrayList<Cook.Plat> getDishesAvailable(){
+        MongoCollection<Document> collectionPlat = database.getCollection("Plat");
+        MongoCollection<Document> collectionIngredient = database.getCollection("Ingredient");
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        FindIterable<Document>  plats = collectionPlat.find();
+        FindIterable<Document>  ingredients = collectionPlat.find();
+        ArrayList<Cook.Plat> listPlats = new ArrayList<>();
+        for (Document d :plats) {
+            for (Document d2:ingredients) {
+                if()
+            }
+        }
+        return plats;
+    }
+*/
+
+
+    public ArrayList<Categorie> getCategories(){
+        MongoCollection<Document> collection = database.getCollection("Categorie");
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        FindIterable<Document>  ingredientsDoc = collection.find();
+        ArrayList<Categorie> categories = new ArrayList<>();
+        for(Document d : ingredientsDoc){
+            categories.add(gson.fromJson(d.toJson(), Categorie.class));
+        }
+        return categories;
     }
 
 }

@@ -36,13 +36,9 @@ public class Order {
         this.dateDebut = dateDebut;
     }
 
-    public String getDateFin() {
-        return dateFin;
-    }
+    public String getDateFin() { return dateFin; }
 
-    public void setDateFin(String dateFin) {
-        this.dateFin = dateFin;
-    }
+    public void setDateFin(String dateFin) { this.dateFin = dateFin; }
 
     public List<fr.ul.miage.Preparation> getPreparation() {
         return Preparation;
