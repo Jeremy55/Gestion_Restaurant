@@ -168,6 +168,21 @@ public class DBQueries {
     }
 
 /*
+
+    public void updateStock(Cook.Plat plat){
+        MongoCollection<Document> collectionPlat = database.getCollection("Plat");
+        MongoCollection<Document> collectionIng = database.getCollection("Ingredient");
+        Document com = new Document().append("_id",plat._id);
+        Document setData = new Document();
+        for (String p : plat.Ingredient) {
+            setData.append("Ingredient", plat.Ingredient.stock);
+        }
+        Document update = new Document();
+        update.append("$set",setData);
+        collectionIng.updateMany(com,update);
+    }
+
+
     public ArrayList<Categorie> getCategoriesWithOneDishAvailable(){
         MongoCollection<Document> collectionCat = database.getCollection("Categorie");
         MongoCollection<Document> collectionPlat = database.getCollection("Plat");

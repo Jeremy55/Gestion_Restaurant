@@ -202,7 +202,7 @@ public class Waiter extends Staff {
         new Button("Terminer commande", new Runnable() {
             @Override
             public void run() {
-                getDbQueries().updateOrder(table.getOrder());
+                //getDbQueries().updateOrder(table.getOrder());
                 Screen();
             }
         }).addTo(panel);
