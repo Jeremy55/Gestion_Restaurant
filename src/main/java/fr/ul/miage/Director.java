@@ -4,6 +4,7 @@ import com.googlecode.lanterna.SGR;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.gui2.*;
+import org.bson.types.ObjectId;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -43,7 +44,7 @@ public class Director extends Staff {
     }
 
     /**
-     * Permet l'affichage du menu du directeur qui comporte de par exemple pouvoir gérer les employés
+     * Permet l'affichage du menu du directeur qui comporte de par exemple pouvoir gérer les employés et les statistiques
      * @return
      */
     public Panel AffichageMenu() {
@@ -75,10 +76,16 @@ public class Director extends Staff {
                 setupWindowAndSwitch(AffichageMenu(),"",1);
             }
         }).addTo(panel);
+        panel.addComponent(new Label("Menu Employés").addStyle(SGR.BOLD));
         panel.addComponent(message.setBackgroundColor(TextColor.ANSI.GREEN));  //Affiche un message de confirmation (création)
-        panel.addComponent(new EmptySpace());
         panel.setLayoutManager(new GridLayout(1));
         //Label lblOutput = lbl;
+        new Button("Consulter les employés", new Runnable() { //Affiche un bouton qui redirige vers la fenêtre pour gérer les employés.
+            @Override
+            public void run() {
+                setupWindowAndSwitch(ConsulterEmployes(),"",1);
+            }
+        }).addTo(panel);
         new Button("Ajouter un nouvel employé", new Runnable() { //Affiche un bouton qui redirige vers la fenêtre pour ajouter un employé
             @Override
             public void run() {
@@ -89,6 +96,66 @@ public class Director extends Staff {
         return panel;
     }
 
+    /**
+     * Affiche la liste de tous les employés avec la possibilité de voir en détails leurs informations
+     * @return
+     */
+    public Panel ConsulterEmployes(){
+        Panel panel = super.deconnection();
+        panel.addComponent(new EmptySpace());
+        new Button("Retour en arrière", new Runnable() { //Affiche un bouton qui permet de revenir en arrière donc sur le menu
+            @Override
+            public void run() {
+                setupWindowAndSwitch(GererEmployes(new Label("")),"",1);
+            }
+        }).addTo(panel);
+        panel.addComponent(new EmptySpace());
+        panel.setLayoutManager(new GridLayout(2));
+        panel.addComponent(new Label("Liste employés : ").addStyle(SGR.BOLD));
+        panel.addComponent(new EmptySpace());
+        List<Staff> employe = getDbQueries().getAllStaff();
+        for(Staff e : employe){
+            panel.addComponent(new Label("   - " + e.getNom() + " " + e.getPrenom()));
+            new Button("Détails", new Runnable() { //Affiche un bouton qui redirige vers la fenêtre pour voir les détails des employés
+                @Override
+                public void run() {
+                    setupWindowAndSwitch(DetailsEmployes(e),"",1);
+                }
+            }).addTo(panel);
+        }
+        setupWindowAndSwitch(panel,"",2);
+        return panel;
+    }
+
+    public Panel DetailsEmployes(Object staff){
+        Panel panel = super.deconnection();
+        new Button("Retour en arrière", new Runnable() { //Affiche un bouton qui permet de revenir en arrière donc sur le menu
+            @Override
+            public void run() {
+                setupWindowAndSwitch(ConsulterEmployes(),"",1);
+            }
+        }).addTo(panel);
+        Staff employe = (Staff) staff;
+        panel.setLayoutManager(new GridLayout(1));
+        panel.addComponent(new EmptySpace());
+        panel.addComponent(new Label("Nom : " + employe.getNom())); //Affichage des informations de l'employés
+        panel.addComponent(new Label("Prenom : " + employe.getPrenom()));
+        panel.addComponent(new Label("Login : " + employe.getLogin()));
+        panel.addComponent(new Label("Mot de passe : " + employe.getMdp()));
+        if(staff instanceof Waiter){
+            panel.addComponent(new Label("Liste des tables affectés : "));
+            List<Table> tablesAll = getDbQueries().getAllTable();
+            List<Table> tables = new ArrayList<>();
+            Waiter a = (Waiter) staff;
+            for(Table t: tablesAll){
+                if(a.getTable().contains(t.get_id())){
+                    panel.addComponent(new Label("  - Table n°"+t.getNumero() + ", étage : " + t.getEtage()));
+                }
+            }
+        }
+        setupWindowAndSwitch(panel,"",1);
+        return panel;
+    }
 
     /**
      * Permet d'ajouter un employé

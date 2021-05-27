@@ -2,8 +2,6 @@ package fr.ul.miage;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
@@ -12,11 +10,7 @@ import static com.mongodb.client.model.Filters.*;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
-import javax.print.Doc;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -314,6 +308,52 @@ public class DBQueries {
             personnel.append("Table", tableID);
         }
         collectionPersonnel.insertOne(personnel);
+    }
+
+    /**
+     * Cette méthode permet de récupérer tout les employés
+     * @return une liste d'employés
+     */
+    public List<Staff> getAllStaff(){
+        MongoCollection<Document> collectionTable = database.getCollection("Personnel");
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        FindIterable<Document> res =  collectionTable.find(); //On récupère tout les employés
+
+        List<Staff> staff = new ArrayList<Staff>();
+        for(Document doc : res){
+            switch(doc.get("role").toString()){ //En fonction du role de l'employé on crée l'objet correspondant
+                case "serveur":
+                    Waiter a = gson.fromJson(doc.toJson(), Waiter.class);
+                    a.setId(doc.getObjectId("_id"));
+                    List l = (List) doc.get("Table");
+                    a.setTable(l);
+                    Staff p = a;
+                    staff.add(p);
+                    break;
+                case "cuisinier":
+                    Staff b = gson.fromJson(doc.toJson(),Cook.class);
+                    b.setId(doc.getObjectId("_id"));
+                    staff.add(b);
+                    break;
+                case "maitre d'hotel":
+                    Staff c = gson.fromJson(doc.toJson(), Butler.class);
+                    c.setId(doc.getObjectId("_id"));
+                    staff.add(c);
+                    break;
+                case "assistant de service":
+                    Staff d = gson.fromJson(doc.toJson(), ServiceAssistant.class);
+                    d.setId(doc.getObjectId("_id"));
+                    staff.add(d);
+                    break;
+                case "directeur":
+                    Staff e = gson.fromJson(doc.toJson(), Director.class);
+                    e.setId(doc.getObjectId("_id"));
+                    staff.add(e);
+                    break;
+            }
+
+        }
+        return staff;
     }
 
 }
