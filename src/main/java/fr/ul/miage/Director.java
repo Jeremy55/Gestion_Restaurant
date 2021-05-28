@@ -4,12 +4,15 @@ import com.googlecode.lanterna.SGR;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.gui2.*;
+import org.bson.types.ObjectId;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.regex.Pattern;
 
 public class Director extends Staff {
@@ -58,6 +61,7 @@ public class Director extends Staff {
                 setupWindowAndSwitch(GererEmployes(new Label("")),"",1);
             }
         }).addTo(panel);
+        buttonManageIngredients().addTo(panel);
         setupWindowAndSwitch(panel,"",1);
         return panel;
     }
@@ -205,6 +209,55 @@ public class Director extends Staff {
 
             }
         }
+    }
+
+    private Button buttonManageIngredients(){
+        return new Button("Gérer les ingrédients", new Runnable() {
+            @Override
+            public void run() {
+                setupWindowAndSwitch(panelManageIngredient(),"Gérer les ingrédients",3);
+            }
+        });
+    }
+
+    private Button mainMenu(){
+        return new Button("Retour au menu", new Runnable() {
+            @Override
+            public void run() {
+                setupWindowAndSwitch(AffichageMenu(),"",1);
+            }
+        });
+    }
+
+    private Panel panelManageIngredient(){
+        Panel panel = new Panel();
+        mainMenu().addTo(panel);
+        panel.addComponent(new EmptySpace());
+        panel.addComponent(new EmptySpace());
+
+        ArrayList<Ingredient> ingredients = getDbQueries().getIngredients();
+        for (Ingredient i : ingredients){
+            panel.addComponent(new Label(i.nom + " : " + i.stock));
+            TextBox quantity = new TextBox().setValidationPattern(Pattern.compile("[0-9]*")).addTo(panel);
+            quantity.addTo(panel);
+            changeQuantity(i._id,quantity).addTo(panel);
+        }
+        return panel;
+    }
+
+    private Button changeQuantity(ObjectId id, TextBox quantity){
+        return new Button("Modifier", new Runnable() {
+            @Override
+            public void run() {
+                if(quantity.getText().equals("")){ // Si l'input est vide on affiche un message d'indication.
+                    setupWindowAndSwitch(panelManageIngredient(),"Merci d'entrer une quantité",3);
+                    return;
+                }
+                int q = Integer.parseInt(quantity.getText());
+                getDbQueries().updateIngredient(id,q);
+                setupWindowAndSwitch(panelManageIngredient(),"Modification effectuée !",3);
+            }
+        });
     }
 
 }
