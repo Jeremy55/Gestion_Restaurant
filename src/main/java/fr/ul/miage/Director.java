@@ -92,6 +92,57 @@ public class Director extends Staff {
                 setupWindowAndSwitch(AjouterEmploye("","","","",0,new ArrayList<>(), getDbQueries().getAllTable(), isWaiter),"",2);
             }
         }).addTo(panel);
+        new Button("Suivre mes employés", new Runnable() { //Affiche un bouton qui redirige vers la fenêtre pour ajouter un employé
+            @Override
+            public void run() {
+                setupWindowAndSwitch(ListeSuiviEmploye(),"",2);
+            }
+        }).addTo(panel);
+        setupWindowAndSwitch(panel,"",1);
+        return panel;
+    }
+
+    public Panel ListeSuiviEmploye(){
+        Panel panel = super.deconnection();
+        new Button("Retour en arrière", new Runnable() { //Affiche un bouton qui permet de revenir en arrière donc sur le menu
+            @Override
+            public void run() {
+                setupWindowAndSwitch(GererEmployes(new Label("")),"",1);
+            }
+        }).addTo(panel);
+        panel.setLayoutManager(new GridLayout(1));
+        panel.addComponent(new EmptySpace());
+        new Button("Suivre les serveurs", new Runnable() { //Affiche un bouton qui redirige vers la fenêtre pour ajouter un employé
+            @Override
+            public void run() {
+                setupWindowAndSwitch(suiviEmploye("serveur"),"",2);
+            }
+        }).addTo(panel);
+        new Button("Suivre les cuisiniers", new Runnable() { //Affiche un bouton qui redirige vers la fenêtre pour ajouter un employé
+            @Override
+            public void run() {
+                setupWindowAndSwitch(suiviEmploye("cuisinier"),"",2);
+            }
+        }).addTo(panel);
+        new Button("Suivre les assistants de service", new Runnable() { //Affiche un bouton qui redirige vers la fenêtre pour ajouter un employé
+            @Override
+            public void run() {
+                setupWindowAndSwitch(suiviEmploye("assistant de service"),"",2);
+            }
+        }).addTo(panel);
+        setupWindowAndSwitch(panel,"",1);
+        return panel;
+    }
+
+    public Panel suiviEmploye(String role){
+        Panel panel = super.deconnection();
+        new Button("Retour en arrière", new Runnable() { //Affiche un bouton qui permet de revenir en arrière donc sur le menu
+            @Override
+            public void run() {
+                setupWindowAndSwitch(ListeSuiviEmploye(),"",1);
+            }
+        }).addTo(panel);
+        panel.setLayoutManager(new GridLayout(1));
         setupWindowAndSwitch(panel,"",1);
         return panel;
     }
