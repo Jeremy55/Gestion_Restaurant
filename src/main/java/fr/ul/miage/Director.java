@@ -166,27 +166,33 @@ public class Director extends Staff {
                     break;
                 case "assistant de service": // Si c'est un rôle assistant de service
                     if(s instanceof ServiceAssistant){ // Et une instance de ServiceAssistant
-                        panel.addComponent(new Label("  - " +s.getNom() + " " + s.getPrenom()+" : "));//On affiche les assistants de service et les tables à débarasser
-                        List<Table> table =getDbQueries().getAllTable();                                   //Les assistants de service ont tous les mêmes tables à débarasser
-                        for(Table t : table){
-                            if(t.getEtat().equals("débarassée")){
-                                panel.addComponent(new Label("\t - Table n°"+t.getNumero()+", étage n°"+t.getEtage()+", état : " +t.getEtat()));
-                            }
-                        }
+                        panel.addComponent(new Label("  - " +s.getNom() + " " + s.getPrenom()));//On affiche les assistants de service et les tables à débarasser
                     }
                     break;
                 case "cuisinier":// Si c'est un rôle cuisinier
                     if(s instanceof Cook){ // Et une instance de Cook
-                        panel.addComponent(new Label("  - " +s.getNom() + " " + s.getPrenom()+" : ")); //On affiche les cuisiniers et les plats en train d'être préparer
-                        List<Preparation> prepa = getDbQueries().getPreparationsEnCours();                  //Les cuisiniers travaillent en équipe sur un même plat.
-                        for(Preparation p : prepa){
-                            if(p.fin != null){
-                                Cook.Plat plat = getDbQueries().getPlat(p.Plat);
-                                panel.addComponent(new Label("\t - " + plat.nom + " commencé le " + p.heureCommande));
-                            }
-                        }
+                        panel.addComponent(new Label("  - " +s.getNom() + " " + s.getPrenom())); //On affiche les cuisiniers et les plats en train d'être préparer
                     }
                     break;
+            }
+        }
+        if(role.equals("assistant de service")){
+            List<Table> table =getDbQueries().getAllTable(); //Les assistants de service ont tous les mêmes tables à débarasser
+            panel.addComponent(new Label("Tables à débarasser : "));
+            for(Table t : table){
+                if(t.getEtat().equals("débarassée")){
+                    panel.addComponent(new Label("\t - Table n°"+t.getNumero()+", étage n°"+t.getEtage()+", état : " +t.getEtat()));
+                }
+            }
+        }
+        if(role.equals("cuisinier")){
+            List<Preparation> prepa = getDbQueries().getPreparationsEnCours(); //Les cuisiniers travaillent en équipe sur un même plat.
+            panel.addComponent(new Label("Plats en préparation : "));
+            for(Preparation p : prepa){
+                if(p.fin != null){
+                    Cook.Plat plat = getDbQueries().getPlat(p.Plat);
+                    panel.addComponent(new Label("\t - " + plat.nom + " commencé le " + p.heureCommande));
+                }
             }
         }
         panel.setLayoutManager(new GridLayout(1));
@@ -225,6 +231,11 @@ public class Director extends Staff {
         return panel;
     }
 
+    /**
+     * Permet d'afficher en détails les informations de l'employé + les tables si c'est un serveur
+     * @param staff
+     * @return
+     */
     public Panel DetailsEmployes(Object staff){
         Panel panel = super.deconnection();
         new Button("Retour en arrière", new Runnable() { //Affiche un bouton qui permet de revenir en arrière donc sur le menu
