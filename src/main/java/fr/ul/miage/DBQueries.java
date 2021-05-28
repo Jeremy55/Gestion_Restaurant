@@ -356,4 +356,41 @@ public class DBQueries {
         return staff;
     }
 
+    /**
+     * Permet de récupérer les informations de plusieurs tables à partir de leur id
+     * @param id
+     * @return
+     */
+    public List<Table> getTableId(List<ObjectId> id) {
+        MongoCollection<Document> collectionTable = database.getCollection("Table");
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+        List<Table> tables = new ArrayList<>();
+        for(ObjectId i : id){
+            Document table = collectionTable.find(eq("_id", i)).first();
+            Table t = gson.fromJson(table.toJson(),Table.class);
+            t.set_id(table.getObjectId("_id"));
+            tables.add(t);
+        }
+        return tables;
+    }
+
+    /**
+     * Permet de récupérer les préparations qui sont en cours.
+     * @return
+     */
+    public ArrayList<Preparation> getPreparationsEnCours(){
+        MongoCollection<Document> collection = database.getCollection("Preparation");
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        FindIterable<Document>  preparationsDoc = collection.find(eq("debut", true));
+        ArrayList<Preparation> preparations = new ArrayList<>();
+        for(Document d : preparationsDoc ){
+            Preparation preparation = gson.fromJson(d.toJson(), Preparation.class);
+            preparation.Plat = d.getObjectId("Plat");
+            preparation._id = d.getObjectId("_id");
+            preparations.add(preparation);
+        }
+        return preparations;
+    }
+
 }

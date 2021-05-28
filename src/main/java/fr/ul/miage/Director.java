@@ -102,6 +102,10 @@ public class Director extends Staff {
         return panel;
     }
 
+    /**
+     * Permet de suivre le type d'employés que l'on souhaite
+     * @return
+     */
     public Panel ListeSuiviEmploye(){
         Panel panel = super.deconnection();
         new Button("Retour en arrière", new Runnable() { //Affiche un bouton qui permet de revenir en arrière donc sur le menu
@@ -134,6 +138,11 @@ public class Director extends Staff {
         return panel;
     }
 
+    /**
+     * Va afficher les informations de suivi pour un role donné
+     * @param role
+     * @return
+     */
     public Panel suiviEmploye(String role){
         Panel panel = super.deconnection();
         new Button("Retour en arrière", new Runnable() { //Affiche un bouton qui permet de revenir en arrière donc sur le menu
@@ -142,6 +151,44 @@ public class Director extends Staff {
                 setupWindowAndSwitch(ListeSuiviEmploye(),"",1);
             }
         }).addTo(panel);
+        List<Staff> staff = getDbQueries().getAllStaff();
+        panel.addComponent(new Label("Liste des " + role + "s : "));
+        for(Staff s : staff){
+            switch (role){ //Permet d'afficher l'interface en fonction du rôle
+                case "serveur": //Si c'est un rôle serveur
+                    if(s instanceof Waiter){ //Et une instance de Waiter
+                        panel.addComponent(new Label("  - " +s.getNom() + " " + s.getPrenom()+" : ")); //On affiche les serveurs et leurs tables
+                        List<Table> table =getDbQueries().getTableId(((Waiter) s).getTable());
+                        for(Table t : table){
+                            panel.addComponent(new Label("\t - Table n°"+t.getNumero()+", étage n°"+t.getEtage()+", état : " +t.getEtat()));
+                        }
+                    }
+                    break;
+                case "assistant de service": // Si c'est un rôle assistant de service
+                    if(s instanceof ServiceAssistant){ // Et une instance de ServiceAssistant
+                        panel.addComponent(new Label("  - " +s.getNom() + " " + s.getPrenom()+" : "));//On affiche les assistants de service et les tables à débarasser
+                        List<Table> table =getDbQueries().getAllTable();                                   //Les assistants de service ont tous les mêmes tables à débarasser
+                        for(Table t : table){
+                            if(t.getEtat().equals("débarassée")){
+                                panel.addComponent(new Label("\t - Table n°"+t.getNumero()+", étage n°"+t.getEtage()+", état : " +t.getEtat()));
+                            }
+                        }
+                    }
+                    break;
+                case "cuisinier":// Si c'est un rôle cuisinier
+                    if(s instanceof Cook){ // Et une instance de Cook
+                        panel.addComponent(new Label("  - " +s.getNom() + " " + s.getPrenom()+" : ")); //On affiche les cuisiniers et les plats en train d'être préparer
+                        List<Preparation> prepa = getDbQueries().getPreparationsEnCours();                  //Les cuisiniers travaillent en équipe sur un même plat.
+                        for(Preparation p : prepa){
+                            if(p.fin != null){
+                                Cook.Plat plat = getDbQueries().getPlat(p.Plat);
+                                panel.addComponent(new Label("\t - " + plat.nom + " commencé le " + p.heureCommande));
+                            }
+                        }
+                    }
+                    break;
+            }
+        }
         panel.setLayoutManager(new GridLayout(1));
         setupWindowAndSwitch(panel,"",1);
         return panel;

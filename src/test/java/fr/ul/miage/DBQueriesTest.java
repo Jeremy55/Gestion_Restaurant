@@ -96,6 +96,21 @@ public class DBQueriesTest {
         assertNotNull(categories);
     }
 
+    @Test
+    void getTableId(){
+        List<ObjectId> id = new ArrayList<ObjectId>();
+        id.add(new ObjectId("60aba63b1a4e41ed8742ed4a"));
+        id.add(new ObjectId("60abaff21a4e41ed8742ed4e"));
+        List<Table> tables = dbQueries.getTableId(id);
+        assertEquals(tables.get(0).get_id(), new ObjectId("60aba63b1a4e41ed8742ed4a"));
+        assertEquals(tables.get(1).get_id(), new ObjectId("60abaff21a4e41ed8742ed4e"));
+    }
+
+    @Test
+    void getPreparationNotNull(){
+        List<Preparation> prepa = dbQueries.getPreparationsEnCours();
+        assertNotNull(prepa);
+    }
 
 
 
