@@ -2,6 +2,7 @@ package fr.ul.miage;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
@@ -392,5 +393,37 @@ public class DBQueries {
         }
         return preparations;
     }
+
+    /**
+     * Permet de modifier un employé
+     * @return
+     */
+    public void modificationEmploye(ObjectId id, String login, String mdp, String nom, String prenom, String role, List<Table> tablesA){
+        MongoCollection<Document> collectionEmploye = database.getCollection("Personnel");
+        Document query = new Document().append("_id", id);
+        Document employe = collectionEmploye.find(eq("_id", id)).first();
+        Document update = new Document();
+        Document setData = new Document();
+        setData.append("login", login); //On modifie les attributs de l'employé
+        setData.append("mdp", mdp);
+        setData.append("nom", nom);
+        setData.append("prenom", prenom);
+        setData.append("role", role);
+        List<ObjectId> tableID = new ArrayList<>();
+        if(role.equals("serveur")){ //Si c'est un serveur
+            for(Table e : tablesA){
+                tableID.add(e.get_id());
+            }
+            setData.append("Table", tableID); //Alors on modifie ses tables affectés
+        }
+        else{ //Si ce n'est pas un serveur
+            update.put("$unset", new BasicDBObject("Table", "")); //Alors on enlève les tables de la bdd, s'il na pas de table de base alors il n'y aura aucun changement
+        }
+
+        update.append("$set", setData);
+
+        collectionEmploye.updateOne(query, update); //On envoie la requête a la bdd
+    }
+
 
 }

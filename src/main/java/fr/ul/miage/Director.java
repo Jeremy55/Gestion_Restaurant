@@ -92,7 +92,13 @@ public class Director extends Staff {
                 setupWindowAndSwitch(AjouterEmploye("","","","",0,new ArrayList<>(), getDbQueries().getAllTable(), isWaiter),"",2);
             }
         }).addTo(panel);
-        new Button("Suivre mes employés", new Runnable() { //Affiche un bouton qui redirige vers la fenêtre pour ajouter un employé
+        new Button("Modifier les employés", new Runnable() { //Affiche un bouton qui redirige vers la fenêtre pour ajouter un employé
+            @Override
+            public void run() {
+                setupWindowAndSwitch(ListeModifierEmploye(),"",2);
+            }
+        }).addTo(panel);
+        new Button("Suivre les employés", new Runnable() { //Affiche un bouton qui redirige vers la fenêtre pour ajouter un employé
             @Override
             public void run() {
                 setupWindowAndSwitch(ListeSuiviEmploye(),"",2);
@@ -101,6 +107,166 @@ public class Director extends Staff {
         setupWindowAndSwitch(panel,"",1);
         return panel;
     }
+
+    /**
+     * Affiche la liste des employés pour ensuite les
+     * @return
+     */
+    public Panel ListeModifierEmploye(){
+        Panel panel = super.deconnection();
+        panel.addComponent(new EmptySpace());
+        new Button("Retour en arrière", new Runnable() { //Affiche un bouton qui permet de revenir en arrière donc sur le menu
+            @Override
+            public void run() {
+                setupWindowAndSwitch(GererEmployes(new Label("")),"",1);
+            }
+        }).addTo(panel);
+        panel.addComponent(new EmptySpace());
+        panel.setLayoutManager(new GridLayout(2));
+        panel.addComponent(new Label("Liste employés : ").addStyle(SGR.BOLD));
+        panel.addComponent(new EmptySpace());
+        List<Staff> employe = getDbQueries().getAllStaff();
+        for(Staff e : employe){
+            panel.addComponent(new Label("   - " + e.getNom() + " " + e.getPrenom()));
+            new Button("Modifier", new Runnable() { //Affiche un bouton qui redirige vers la fenêtre pour voir les détails des employés
+                @Override
+                public void run() {
+                    List<Table> table = new ArrayList<>();
+                    String role = "";
+                    if(e instanceof Waiter){ //Si c'est un serveur
+                        role = "serveur";
+                        isWaiter = true; //On met le booléen a vrai
+                        Waiter a = (Waiter) e;
+                        if(a != null){
+                            table = getDbQueries().getTableId(a.getTable()); //et on récupère ses tables
+                        }
+                    }
+                    if(e instanceof Cook){ //Si ce n'est pas un serveur, on met le booléen a faux et on instancie le role
+                        isWaiter = false; role="cuisinier";} else if(e instanceof ServiceAssistant){isWaiter = false; role="assistant de service";} else if(e instanceof Butler){isWaiter = false; role="maitre d'hotel";} else if(e instanceof Director){isWaiter = false; role="directeur";}
+
+                    setupWindowAndSwitch(ModifierEmploye(e.getId(),e.getLogin(), e.getMdp(), e.getNom(), e.getPrenom(), role, table, getDbQueries().getAllTable()),"",1);
+                }
+            }).addTo(panel);
+        }
+        setupWindowAndSwitch(panel,"",2);
+        return panel;
+    }
+
+    /**
+     * Affiche la liste des employés pour ensuite les
+     * @return
+     */
+    public Panel ModifierEmploye(ObjectId id, String log, String m, String n, String p, String r, List<Table> tablesA, List<Table> tableAll){
+        Panel panel = super.deconnection();
+        panel.addComponent(new EmptySpace());
+        new Button("Retour en arrière", new Runnable() { //Affiche un bouton qui permet de revenir en arrière donc sur le menu
+            @Override
+            public void run() {
+                setupWindowAndSwitch(ListeModifierEmploye(),"",1);
+            }
+        }).addTo(panel);
+        ComboBox<String> roles = new ComboBox<String>();
+        roles.addItem("cuisinier").addItem("serveur").addItem("assistant de service").addItem("maitre d'hotel").addItem("directeur"); //On définit les roles possibles
+
+        panel.addComponent(new EmptySpace());
+        panel.addComponent(new Label("Modification de l'employé").addStyle(SGR.BOLD));
+        panel.addComponent(new EmptySpace());
+        panel.addComponent(new Label("Login de l'employé:"));
+        final TextBox login = new TextBox().setText(log).addTo(panel); // Contient le login de l'employé
+
+        panel.addComponent(new Label("Mot de passe de l'employé:"));
+        final TextBox mdp = new TextBox().setText(m).addTo(panel); // Contient le mot de passe de l'employé
+
+        panel.addComponent(new Label("Nom de l'employé:"));
+        final TextBox nom = new TextBox().setText(n).setValidationPattern(Pattern.compile("[A-Za-z ]*")).addTo(panel); // Contient le nom de l'employé
+
+        panel.addComponent(new Label("Prénom de l'employé:"));
+        final TextBox prenom = new TextBox().setText(p).setValidationPattern(Pattern.compile("[A-Za-z ]*")).addTo(panel); // Contient le prénom de l'employé
+
+        panel.addComponent(new Label("Rôle de l'employé :"));
+        ComboBox<String> role = roles; // Permet de sélectionner le rôle de l'employé
+        role.setSelectedItem(r);
+        panel.addComponent(role);
+        role.addListener(new ComboBox.Listener() { //Ajoute un Listener à la combobox qui permet d'éxécuter une méthode a chaque fois qu'une valeur est sélectionnée dans la combobox
+            @Override
+            public void onSelectionChanged(int selectedIndex, int previousSelection, boolean changedByUserInteraction) {
+                Object selected = role.getSelectedItem(); //On récupère le role sélectionné
+                if(selected.equals("serveur")){ //Si c'est le serveur, on rappelle la fenêtre avec le booleen IsWaiter a vrai
+                    isWaiter = true;
+                    setupWindowAndSwitch(ModifierEmploye(id,login.getText(), mdp.getText(), nom.getText(), prenom.getText(), role.getSelectedItem(), tablesA, tableAll ),"",2);
+                }
+                else{ //Si ce n'est pas le serveur, on rappelle la fenêtre avec le booleen IsWaiter a faux
+                    isWaiter = false;
+                    setupWindowAndSwitch(ModifierEmploye(id,login.getText(), mdp.getText(), nom.getText(), prenom.getText(), role.getSelectedItem(), tablesA, tableAll),"",2);
+                }
+            }
+        });
+        if(isWaiter){ //Si isWaiter est a vrai alors on affiche le menu pour les tables
+            affichageTableServeurModification(panel,id, tablesA, tableAll, login.getText(), mdp.getText(), nom.getText(), prenom.getText(), role.getSelectedItem());
+        }
+        panel.addComponent(new EmptySpace());
+        new Button("Modifier", new Runnable() { //Affiche un bouton qui permet de modifier l'employé
+            @Override
+            public void run() {
+                getDbQueries().modificationEmploye(id,login.getText(), mdp.getText(), nom.getText(), prenom.getText(), role.getSelectedItem(), tablesA); //modifie l'employé dans le bdd
+                setupWindowAndSwitch(GererEmployes(new Label("L'employé "+ nom.getText() + " " + prenom.getText() + " a bien été modifié")),"",1); //Renvoie vers la fenêtre de gestion des employés avec un message de confirmation
+            }
+        }).addTo(panel);
+        setupWindowAndSwitch(panel,"",2);
+        return panel;
+    }
+
+    /**
+     * Permet d'afficher les tables affectées ou non de l'employé pour la modification
+     * @param panel
+     * @param tableAffectes
+     * @param tables
+     * @param login
+     * @param mdp
+     * @param nom
+     * @param prenom
+     * @param role
+     */
+    public void affichageTableServeurModification(Panel panel, ObjectId id, List<Table> tableAffectes, List<Table> tables, String login, String mdp, String nom, String prenom, String role){
+        panel.addComponent(new Label("Tables affectées :"));
+        panel.addComponent(new EmptySpace());
+        if(tableAffectes != null){ //S'il existe des tables affectées
+            for(Table e : tableAffectes){
+                panel.addComponent(new Label("  - Table n°"+e.getNumero()+" étage :" +e.getEtage())); //On les ajoute
+                new Button("Retirer la table" , new Runnable() {
+                    @Override
+                    public void run() {
+                        tableAffectes.remove(e);
+                        setupWindowAndSwitch(ModifierEmploye(id,login, mdp, nom, prenom, role, tableAffectes, tables),"",2);
+                    }
+                }).addTo(panel);
+            }
+        }
+        panel.addComponent(new Label("Tables non affectées :"));
+        panel.addComponent(new EmptySpace());
+        if(tables != null){ //S'il existe des tables non affectées
+            for(Table e : tables){
+                boolean existe = false; //On dit qu'il n'existe pas de base dans les tables affectés
+                for(Table affecte : tableAffectes){ //On parcoure les tables affectés
+                    if(affecte.get_id().equals(e.get_id())){ //On regarde si la table existe dans les tables affectés
+                        existe = true; //Si oui alors on met le booléen a vrai
+                    }
+                }
+                if(!existe){ //Si le booléen est a faux donc que la table n'existe pas
+                    panel.addComponent(new Label("  - Table n°"+e.getNumero()+" étage :" +e.getEtage())); //On l'affiche
+                    new Button("Affecter la table" , new Runnable() { //Bouton qui va permettre d'affecter une table
+                        @Override
+                        public void run() {
+                            tableAffectes.add(e); //va rajouter dans la liste de table affectés la table sélectionnée
+                            setupWindowAndSwitch(ModifierEmploye(id,login, mdp, nom, prenom, role, tableAffectes, tables),"",2);
+                        }
+                    }).addTo(panel);
+                }
+
+            }
+        }
+    }
+
 
     /**
      * Permet de suivre le type d'employés que l'on souhaite
@@ -366,6 +532,7 @@ public class Director extends Staff {
         panel.addComponent(new EmptySpace());
         panel.addComponent(new Label("Tables non affectées :"));
         panel.addComponent(new EmptySpace());
+
         if(tables != null){ //S'il existe des tables non affectées
             for(Table e : tables){
                 if (!tableAffectes.contains(e)) { //On vérifie que cette table n'existe pas dans les tables affectées a l'employé
