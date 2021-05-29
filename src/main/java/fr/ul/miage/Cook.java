@@ -7,6 +7,8 @@ import org.bson.types.ObjectId;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -202,7 +204,7 @@ public class Cook extends Staff {
         return new Button("Préparation terminée", new Runnable() {
             @Override
             public void run() {
-                p.fin = new Date().toString();
+                p.fin = DateTimeFormatter.ofPattern("dd-MM-uuuu HH:mm:ss").format(LocalDateTime.now());
                 getDbQueries().updatePreparation(p);
                 setupWindowAndSwitch(panelBackLogPreparations(),"Plat restant");
             }
