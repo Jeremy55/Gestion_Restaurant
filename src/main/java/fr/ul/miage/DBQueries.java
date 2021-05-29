@@ -393,4 +393,73 @@ public class DBQueries {
         collection.updateOne(query,update);
     }
 
+    /**
+     * Permet de récupérer les informations de plusieurs tables à partir de leur id
+     * @param id
+     * @return
+     */
+    public List<Table> getTableId(List<ObjectId> id) {
+        MongoCollection<Document> collectionTable = database.getCollection("Table");
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+        List<Table> tables = new ArrayList<>();
+        for(ObjectId i : id){
+            Document table = collectionTable.find(eq("_id", i)).first();
+            Table t = gson.fromJson(table.toJson(),Table.class);
+            t.set_id(table.getObjectId("_id"));
+            tables.add(t);
+        }
+        return tables;
+    }
+
+    /**
+     * Permet de récupérer les préparations qui sont en cours.
+     * @return
+     */
+    public ArrayList<Preparation> getPreparationsEnCours(){
+        MongoCollection<Document> collection = database.getCollection("Preparation");
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        FindIterable<Document>  preparationsDoc = collection.find(eq("debut", true));
+        ArrayList<Preparation> preparations = new ArrayList<>();
+        for(Document d : preparationsDoc ){
+            Preparation preparation = gson.fromJson(d.toJson(), Preparation.class);
+            preparation.Plat = d.getObjectId("Plat");
+            preparation._id = d.getObjectId("_id");
+            preparations.add(preparation);
+        }
+        return preparations;
+    }
+
+    /**
+     * Permet de modifier un employé
+     * @return
+     */
+    public void modificationEmploye(ObjectId id, String login, String mdp, String nom, String prenom, String role, List<Table> tablesA){
+        MongoCollection<Document> collectionEmploye = database.getCollection("Personnel");
+        Document query = new Document().append("_id", id);
+        Document employe = collectionEmploye.find(eq("_id", id)).first();
+        Document update = new Document();
+        Document setData = new Document();
+        setData.append("login", login); //On modifie les attributs de l'employé
+        setData.append("mdp", mdp);
+        setData.append("nom", nom);
+        setData.append("prenom", prenom);
+        setData.append("role", role);
+        List<ObjectId> tableID = new ArrayList<>();
+        if(role.equals("serveur")){ //Si c'est un serveur
+            for(Table e : tablesA){
+                tableID.add(e.get_id());
+            }
+            setData.append("Table", tableID); //Alors on modifie ses tables affectés
+        }
+        else{ //Si ce n'est pas un serveur
+            update.put("$unset", new BasicDBObject("Table", "")); //Alors on enlève les tables de la bdd, s'il na pas de table de base alors il n'y aura aucun changement
+        }
+
+        update.append("$set", setData);
+
+        collectionEmploye.updateOne(query, update); //On envoie la requête a la bdd
+    }
+
+
 }
