@@ -3,6 +3,7 @@ package fr.ul.miage;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
@@ -11,6 +12,7 @@ import static com.mongodb.client.model.Filters.*;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
+import javax.print.Doc;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,14 +66,16 @@ public class DBQueries {
     }
 
     public ArrayList<Ingredient> getIngredients(){
-       MongoCollection<Document> collection = database.getCollection("Ingredient");
-       Gson gson = new GsonBuilder().setPrettyPrinting().create();
-       FindIterable<Document>  ingredientsDoc = collection.find();
-       ArrayList<Ingredient> ingredients = new ArrayList<>();
-       for(Document d : ingredientsDoc){
-           ingredients.add(gson.fromJson(d.toJson(), Ingredient.class));
-       }
-       return ingredients;
+        MongoCollection<Document> collection = database.getCollection("Ingredient");
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        FindIterable<Document>  ingredientsDoc = collection.find();
+        ArrayList<Ingredient> ingredients = new ArrayList<>();
+        for(Document d : ingredientsDoc){
+            Ingredient i = gson.fromJson(d.toJson(), Ingredient.class);
+            i._id = d.getObjectId("_id");
+            ingredients.add(i);
+        }
+        return ingredients;
     }
 
     public ArrayList<Categorie> getCategories(){
@@ -89,10 +93,10 @@ public class DBQueries {
         MongoCollection<Document> collection = database.getCollection("Plat");
         Document plat = new Document("_id",new ObjectId());
         plat.append("nom",nomPlat)
-        .append("Ingredient",ingredients)
-        .append("Categorie",categorie)
-        .append("prix",prix)
-        .append("platDuJour",false);
+                .append("Ingredient",ingredients)
+                .append("Categorie",categorie)
+                .append("prix",prix)
+                .append("platDuJour",false);
         collection.insertOne(plat);
     }
 
@@ -355,6 +359,38 @@ public class DBQueries {
 
         }
         return staff;
+    }
+    public void updateIngredient(ObjectId _id, int quantity){
+        MongoCollection<Document> collection = database.getCollection("Ingredient");
+        Document query = new Document().append("_id",_id);
+        Document setData = new Document();
+        setData.append("stock",quantity);
+        Document update = new Document();
+        update.append("$set",setData);
+        collection.updateOne(query,update);
+    }
+
+    public ArrayList<Cook.Plat> getAllPlats(){
+        MongoCollection<Document> collection = database.getCollection("Plat");
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        FindIterable<Document>  platsDoc = collection.find();
+        ArrayList<Cook.Plat> plats = new ArrayList<>();
+        for(Document d : platsDoc){
+            Cook.Plat i = gson.fromJson(d.toJson(), Cook.Plat.class);
+            i._id = d.getObjectId("_id");
+            plats.add(i);
+        }
+        return plats;
+    }
+
+    public void modifierPlat(Cook.Plat plat,boolean dansLeMenu){
+        MongoCollection<Document> collection = database.getCollection("Plat");
+        Document query = new Document().append("_id",plat._id);
+        Document setData = new Document();
+        setData.append("platDuJour",dansLeMenu);
+        Document update = new Document();
+        update.append("$set",setData);
+        collection.updateOne(query,update);
     }
 
     /**

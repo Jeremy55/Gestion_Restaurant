@@ -11,6 +11,8 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.regex.Pattern;
 
 public class Director extends Staff {
@@ -44,7 +46,7 @@ public class Director extends Staff {
     }
 
     /**
-     * Permet l'affichage du menu du directeur qui comporte de par exemple pouvoir gérer les employés et les statistiques
+     * Permet l'affichage du menu du directeur qui comporte de par exemple pouvoir gérer les employés
      * @return
      */
     public Panel AffichageMenu() {
@@ -59,6 +61,8 @@ public class Director extends Staff {
                 setupWindowAndSwitch(GererEmployes(new Label("")),"",1);
             }
         }).addTo(panel);
+        buttonManageIngredients().addTo(panel);
+        buttonMenuJour().addTo(panel);
         setupWindowAndSwitch(panel,"",1);
         return panel;
     }
@@ -78,6 +82,7 @@ public class Director extends Staff {
         }).addTo(panel);
         panel.addComponent(new Label("Menu Employés").addStyle(SGR.BOLD));
         panel.addComponent(message.setBackgroundColor(TextColor.ANSI.GREEN));  //Affiche un message de confirmation (création)
+        panel.addComponent(new EmptySpace());
         panel.setLayoutManager(new GridLayout(1));
         //Label lblOutput = lbl;
         new Button("Consulter les employés", new Runnable() { //Affiche un bouton qui redirige vers la fenêtre pour gérer les employés.
@@ -532,7 +537,6 @@ public class Director extends Staff {
         panel.addComponent(new EmptySpace());
         panel.addComponent(new Label("Tables non affectées :"));
         panel.addComponent(new EmptySpace());
-
         if(tables != null){ //S'il existe des tables non affectées
             for(Table e : tables){
                 if (!tableAffectes.contains(e)) { //On vérifie que cette table n'existe pas dans les tables affectées a l'employé
@@ -550,4 +554,113 @@ public class Director extends Staff {
         }
     }
 
+    private Button buttonManageIngredients(){
+        return new Button("Gérer les ingrédients", new Runnable() {
+            @Override
+            public void run() {
+                setupWindowAndSwitch(panelManageIngredient(),"Gérer les ingrédients",3);
+            }
+        });
+    }
+
+    private Button mainMenu(){
+        return new Button("Retour au menu", new Runnable() {
+            @Override
+            public void run() {
+                setupWindowAndSwitch(AffichageMenu(),"",1);
+            }
+        });
+    }
+
+    private Panel panelManageIngredient(){
+        Panel panel = new Panel();
+        mainMenu().addTo(panel);
+        panel.addComponent(new EmptySpace());
+        panel.addComponent(new EmptySpace());
+
+        ArrayList<Ingredient> ingredients = getDbQueries().getIngredients();
+        for (Ingredient i : ingredients){
+            panel.addComponent(new Label(i.nom + " : " + i.stock));
+            TextBox quantity = new TextBox().setValidationPattern(Pattern.compile("[0-9]*")).addTo(panel);
+            quantity.addTo(panel);
+            changeQuantity(i._id,quantity).addTo(panel);
+        }
+        return panel;
+    }
+
+    private Button changeQuantity(ObjectId id, TextBox quantity){
+        return new Button("Modifier", new Runnable() {
+            @Override
+            public void run() {
+                if(quantity.getText().equals("")){ // Si l'input est vide on affiche un message d'indication.
+                    setupWindowAndSwitch(panelManageIngredient(),"Merci d'entrer une quantité",3);
+                    return;
+                }
+                int q = Integer.parseInt(quantity.getText());
+                getDbQueries().updateIngredient(id,q);
+                setupWindowAndSwitch(panelManageIngredient(),"Modification effectuée !",3);
+            }
+        });
+    }
+
+    private Button buttonMenuJour(){
+        return new Button("Voir la carte du jour", new Runnable() {
+            @Override
+            public void run() {
+                setupWindowAndSwitch(panelMenuDujour(),"",1);
+            }
+        });
+    }
+
+    private Button buttonModifierMenuJour(){
+        return new Button("Modifier la carte du jour", new Runnable() {
+            @Override
+            public void run() {
+                setupWindowAndSwitch(panelModifierMenuDujour(),"Modification de la carte du jour",3);
+            }
+        });
+    }
+
+    private Panel panelMenuDujour(){
+        Panel panel = new Panel();
+        mainMenu().addTo(panel);
+        buttonModifierMenuJour().addTo(panel);
+        panel.addComponent(new Label("Composition du menu du jour :"));
+
+        ArrayList<Cook.Plat> plats  = getDbQueries().getAllPlats();
+        String message = "Le menu est vide";
+        for (Cook.Plat p : plats){
+            if(p.platDuJour){
+                message = "";
+                panel.addComponent(new Label(p.nom));
+            }
+        }
+        panel.addComponent(new Label(message));
+        return panel;
+    }
+
+    private Panel panelModifierMenuDujour(){
+        Panel panel = new Panel();
+        mainMenu().addTo(panel);
+        panel.addComponent(new EmptySpace());
+        panel.addComponent(new EmptySpace());
+
+        ArrayList<Cook.Plat> plats  = getDbQueries().getAllPlats();
+        for (Cook.Plat p : plats){
+            panel.addComponent(new Label(p.nom));
+            panel.addComponent(new Label(p.platDuJour ? "Dans le menu" : "Pas dans le menu"));
+            buttonTogglePlatDuJour(p).addTo(panel);
+        }
+        return panel;
+    }
+
+    private Button buttonTogglePlatDuJour(Cook.Plat plat){
+        return new Button("Modifier la carte du jour", new Runnable() {
+            @Override
+            public void run() {
+                getDbQueries().modifierPlat(plat, !plat.platDuJour);
+                setupWindowAndSwitch(panelModifierMenuDujour(),"Modifier",3);
+            }
+        });
+    }
 }
