@@ -9,6 +9,8 @@ import org.bson.types.ObjectId;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -63,6 +65,7 @@ public class Director extends Staff {
         }).addTo(panel);
         buttonManageIngredients().addTo(panel);
         buttonMenuJour().addTo(panel);
+        buttonRotationMoyen().addTo(panel);
         setupWindowAndSwitch(panel,"",1);
         return panel;
     }
@@ -662,5 +665,40 @@ public class Director extends Staff {
                 setupWindowAndSwitch(panelModifierMenuDujour(),"Modifier",3);
             }
         });
+    }
+    private Button buttonRotationMoyen(){
+        return new Button("Voir le temps de rotation moyen des clients", new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    setupWindowAndSwitch(panelRotationMoyen(),"",1);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    private Panel panelRotationMoyen() throws ParseException, ParseException {
+        Panel panel = new Panel();
+        mainMenu().addTo(panel);
+
+        Long temps = null;
+        int tempsMoyen = 0;
+        int compteur = 0;
+        SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        List<Order> commandes = getDbQueries().getAllCommandes();
+        for(Order c : commandes){
+            if(c.getDateFin()!= null && !c.getDateFin().equals("")){
+                temps = SDF.parse(c.getDateFin()).getTime()-(SDF.parse(c.getDateDebut())).getTime();
+                tempsMoyen += temps;
+                compteur++;
+            }
+
+        }
+        tempsMoyen = tempsMoyen/compteur;
+        panel.addComponent(new Label("Le temps de rotation moyen des clients est de :"));
+        panel.addComponent(new Label((tempsMoyen%86400000)/3600000+" heures, "+((tempsMoyen%86400000)%3600000)/60000+" minutes et "+(((tempsMoyen%86400000)%3600000)%60000)/1000+" secondes"));
+        return panel;
     }
 }

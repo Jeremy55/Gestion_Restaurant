@@ -461,5 +461,23 @@ public class DBQueries {
         collectionEmploye.updateOne(query, update); //On envoie la requête a la bdd
     }
 
+    /**
+     * Cette méthode permet de récupérer toutes les commandes
+     * @return une liste de Table
+     */
+    public List<Order> getAllCommandes(){
+        MongoCollection<Document> collectionCommande = database.getCollection("Commande");
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        FindIterable<Document> commandeAll =  collectionCommande.find(); //On récupère toutes les commande
+
+        List<Order> commandes = new ArrayList<>();
+        for(Document doc : commandeAll){
+            Order a = gson.fromJson(doc.toJson(),Order.class); //On transforme les documents en commande
+            a.set_id(doc.getObjectId("_id"));
+            commandes.add(a);
+        }
+        return commandes;
+    }
+
 
 }
