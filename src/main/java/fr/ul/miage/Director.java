@@ -62,6 +62,7 @@ public class Director extends Staff {
             }
         }).addTo(panel);
         buttonManageIngredients().addTo(panel);
+        buttonMenuJour().addTo(panel);
         setupWindowAndSwitch(panel,"",1);
         return panel;
     }
@@ -260,4 +261,64 @@ public class Director extends Staff {
         });
     }
 
+    private Button buttonMenuJour(){
+        return new Button("Voir la carte du jour", new Runnable() {
+            @Override
+            public void run() {
+                setupWindowAndSwitch(panelMenuDujour(),"",1);
+            }
+        });
+    }
+
+    private Button buttonModifierMenuJour(){
+        return new Button("Modifier la carte du jour", new Runnable() {
+            @Override
+            public void run() {
+                setupWindowAndSwitch(panelModifierMenuDujour(),"Modification de la carte du jour",3);
+            }
+        });
+    }
+
+    private Panel panelMenuDujour(){
+        Panel panel = new Panel();
+        mainMenu().addTo(panel);
+        buttonModifierMenuJour().addTo(panel);
+        panel.addComponent(new Label("Composition du menu du jour :"));
+
+        ArrayList<Cook.Plat> plats  = getDbQueries().getAllPlats();
+        String message = "Le menu est vide";
+        for (Cook.Plat p : plats){
+            if(p.platDuJour){
+                message = "";
+                panel.addComponent(new Label(p.nom));
+            }
+        }
+        panel.addComponent(new Label(message));
+        return panel;
+    }
+
+    private Panel panelModifierMenuDujour(){
+        Panel panel = new Panel();
+        mainMenu().addTo(panel);
+        panel.addComponent(new EmptySpace());
+        panel.addComponent(new EmptySpace());
+
+        ArrayList<Cook.Plat> plats  = getDbQueries().getAllPlats();
+        for (Cook.Plat p : plats){
+            panel.addComponent(new Label(p.nom));
+            panel.addComponent(new Label(p.platDuJour ? "Dans le menu" : "Pas dans le menu"));
+            buttonTogglePlatDuJour(p).addTo(panel);
+        }
+        return panel;
+    }
+
+    private Button buttonTogglePlatDuJour(Cook.Plat plat){
+        return new Button("Modifier la carte du jour", new Runnable() {
+            @Override
+            public void run() {
+                getDbQueries().modifierPlat(plat, !plat.platDuJour);
+                setupWindowAndSwitch(panelModifierMenuDujour(),"Modifier",3);
+            }
+        });
+    }
 }

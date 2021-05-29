@@ -12,6 +12,7 @@ import static com.mongodb.client.model.Filters.*;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
+import javax.print.Doc;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -364,6 +365,29 @@ public class DBQueries {
         Document query = new Document().append("_id",_id);
         Document setData = new Document();
         setData.append("stock",quantity);
+        Document update = new Document();
+        update.append("$set",setData);
+        collection.updateOne(query,update);
+    }
+
+    public ArrayList<Cook.Plat> getAllPlats(){
+        MongoCollection<Document> collection = database.getCollection("Plat");
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        FindIterable<Document>  platsDoc = collection.find();
+        ArrayList<Cook.Plat> plats = new ArrayList<>();
+        for(Document d : platsDoc){
+            Cook.Plat i = gson.fromJson(d.toJson(), Cook.Plat.class);
+            i._id = d.getObjectId("_id");
+            plats.add(i);
+        }
+        return plats;
+    }
+
+    public void modifierPlat(Cook.Plat plat,boolean dansLeMenu){
+        MongoCollection<Document> collection = database.getCollection("Plat");
+        Document query = new Document().append("_id",plat._id);
+        Document setData = new Document();
+        setData.append("platDuJour",dansLeMenu);
         Document update = new Document();
         update.append("$set",setData);
         collection.updateOne(query,update);
