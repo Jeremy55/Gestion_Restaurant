@@ -11,10 +11,9 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.regex.Pattern;
 
 public class Director extends Staff {
@@ -67,6 +66,7 @@ public class Director extends Staff {
         buttonMenuJour().addTo(panel);
         buttonRotationMoyen().addTo(panel);
         buttonPreparationMoyen().addTo(panel);
+        buttonCADejDiner().addTo(panel);
         setupWindowAndSwitch(panel,"",1);
         return panel;
     }
@@ -736,6 +736,53 @@ public class Director extends Staff {
         tempsMoyen = tempsMoyen/compteur;
         panel.addComponent(new Label("Le temps de préparation moyen des cuisiniers est de :"));
         panel.addComponent(new Label((tempsMoyen%86400000)/3600000+" heures, "+((tempsMoyen%86400000)%3600000)/60000+" minutes et "+(((tempsMoyen%86400000)%3600000)%60000)/1000+" secondes"));
+        return panel;
+    }
+
+    private Button buttonCADejDiner(){
+        return new Button("Voir le CA du déjeuner et du diner", new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    setupWindowAndSwitch(panelCADejDiner(),"",1);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    private Panel panelCADejDiner() throws ParseException, ParseException {
+        Panel panel = new Panel();
+        mainMenu().addTo(panel);
+
+        Date dateDejeunerDebut = new SimpleDateFormat("HH:mm:ss").parse("12:00:00");
+        Date dateDejeunerFin = new SimpleDateFormat("HH:mm:ss").parse("14:00:00");
+        Date dateDinerDebut = new SimpleDateFormat("HH:mm:ss").parse("18:00:00");
+        Date dateDinerFin = new SimpleDateFormat("HH:mm:ss").parse("20:00:00");
+        int CAdej = 0;
+        int CAdiner = 0;
+        SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        List<Order> commandes = getDbQueries().getAllCommandes();
+
+        for(Order c : commandes){
+            if(c.getDateFin()!= null && !c.getDateFin().equals("")){
+                Date debut = SDF.parse(c.getDateDebut());
+                Date fin = SDF.parse(c.getDateFin());
+                if(debut.getHours() >= dateDejeunerDebut.getHours() && fin.getHours() <= dateDejeunerFin.getHours()){
+                    CAdej += c.getMontant();
+                }
+                if(debut.getHours() >= dateDinerDebut.getHours() && fin.getHours() <= dateDinerFin.getHours()){
+                    System.out.println(c.get_id());
+                    System.out.println(debut.getHours());
+                    CAdiner += c.getMontant();
+                }
+            }
+
+        }
+
+        panel.addComponent(new Label("Le CA du déjeuner (12h - 15h) est de "+ CAdej + " euros"));
+        panel.addComponent(new Label("Le CA du diner (18h - 21h) est de " + CAdiner + " euros"));
         return panel;
     }
 }
