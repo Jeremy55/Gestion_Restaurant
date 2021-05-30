@@ -3,11 +3,11 @@ package fr.ul.miage;
 import org.bson.types.ObjectId;
 
 public class Table {
-    private Object _id;
+    private ObjectId _id;
     private int numero;
     private int etage;
     private String etat;
-    private Order order;
+    private ObjectId Commande;
     private int nbCouvert;
 
     public Table(int etage, String etat, int nbCouvert) {
@@ -16,16 +16,9 @@ public class Table {
         this.nbCouvert = nbCouvert;
     }
 
-    public Table(int etage, String etat, int nbCouvert, Order order) {
-        this.etage = etage;
-        this.etat = etat;
-        this.nbCouvert = nbCouvert;
-        this.order = order;
-    }
+    public ObjectId get_id() { return _id; }
 
-    public Object get_id() { return _id; }
-
-    public void set_id(Object _id) { this._id = _id; }
+    public void set_id(ObjectId _id) { this._id = _id; }
 
     public int getNumero() { return numero; }
 
@@ -43,9 +36,9 @@ public class Table {
 
     public void setNbCouvert(int nbCouvert) { this.nbCouvert = nbCouvert; }
 
-    public Order getOrder() { return order; }
+    public ObjectId getCommande() { return Commande; }
 
-    public void setOrder(Order order) { this.order = order; }
+    public void setCommande(ObjectId commande) { Commande = commande; }
 
     @Override
     public String toString() {
@@ -54,4 +47,6 @@ public class Table {
                 "\n etat : " + etat  +
                 "\n nbCouvert : " + nbCouvert;
     }
+
+
 }

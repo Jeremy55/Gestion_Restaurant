@@ -2,6 +2,8 @@ package fr.ul.miage;
 
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
+import fr.ul.miage.MainTerminal;
+import fr.ul.miage.Staff;
 import org.bson.types.ObjectId;
 
 import java.io.IOException;

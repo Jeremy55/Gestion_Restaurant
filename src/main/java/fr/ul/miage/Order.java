@@ -2,6 +2,8 @@ package fr.ul.miage;
 
 import org.bson.types.ObjectId;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,15 +11,14 @@ public class Order {
     private ObjectId _id;
     private String dateDebut;
     private String dateFin;
-    private List<Preparation> Preparation;
+    private List<ObjectId> Preparation;
     private Double montant;
 
-    public Order(ObjectId _id, String dateDebut, String dateFin, Double montant) {
+    public Order(ObjectId _id, Double montant) {
         this._id = _id;
-        this.dateDebut = dateDebut;
-        this.dateFin = dateFin;
+        this.dateDebut = DateTimeFormatter.ofPattern("dd-MM-uuuu HH:mm:ss").format(LocalDateTime.now());
         this.montant = montant;
-        Preparation = new ArrayList<Preparation>();
+        Preparation = new ArrayList<ObjectId>();
     }
 
     public ObjectId get_id() {
@@ -40,11 +41,11 @@ public class Order {
 
     public void setDateFin(String dateFin) { this.dateFin = dateFin; }
 
-    public List<fr.ul.miage.Preparation> getPreparation() {
+    public List<ObjectId> getPreparation() {
         return Preparation;
     }
 
-    public void setPreparation(List<fr.ul.miage.Preparation> preparation) {
+    public void setPreparation(List<ObjectId> preparation) {
         Preparation = preparation;
     }
 
@@ -58,7 +59,8 @@ public class Order {
 
     @Override
     public String toString() {
-        return  "dateDebut='" + dateDebut + '\'' +
+        return  "_id='" + _id + '\'' +
+                ",dateDebut='" + dateDebut + '\'' +
                 ", dateFin='" + dateFin + '\'' +
                 ", Preparation=" + Preparation +
                 ", montant=" + montant;

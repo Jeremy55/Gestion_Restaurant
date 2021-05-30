@@ -1,18 +1,14 @@
 package fr.ul.miage;
 
-import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
-import com.googlecode.lanterna.graphics.SimpleTheme;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.Button;
 import com.googlecode.lanterna.gui2.GridLayout;
 import com.googlecode.lanterna.gui2.Label;
 import com.googlecode.lanterna.gui2.Panel;
 import org.bson.types.ObjectId;
-import org.w3c.dom.Text;
 
-import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,11 +34,10 @@ public class Waiter extends Staff {
         Panel panel = super.deconnection();
         panel.setLayoutManager(new GridLayout(2));
         panel.addComponent(new EmptySpace(new TerminalSize(0, 0)));
-        //panel.addComponent(new Label("Menu serveur").setPosition(new TerminalPosition(1)));
         panel.addComponent(new Label("Menu serveur"));
         panel.addComponent(new EmptySpace());
         List<Integer> listEtages = getFloors(getDbQueries().getWaiterTables(this));
-        List<Table> listTables = getDbQueries().getWaiterTables(this);
+        List<fr.ul.miage.Table> listTables = getDbQueries().getWaiterTables(this);
 
         for (Integer etage :listEtages) {
             panel.addComponent(new Label("Etage n°" + etage.intValue() + " :"));
@@ -61,8 +56,7 @@ public class Waiter extends Staff {
 
                 }
             }
-            panel.addComponent(new EmptySpace());
-            panel.addComponent(new EmptySpace());
+            emptySpace(panel);
         }
 
         BasicWindow window = new BasicWindow();
@@ -105,7 +99,7 @@ public class Waiter extends Staff {
             case "occupé":
                 lbl.setBackgroundColor(TextColor.ANSI.YELLOW_BRIGHT);
                 break;
-            case "a débarassée":
+            case "débarassée":
                 lbl.setBackgroundColor(TextColor.ANSI.RED_BRIGHT);
                 break;
             case "réservé":
@@ -141,7 +135,86 @@ public class Waiter extends Staff {
             }).addTo(panel);
         }
 
+        if(table.getCommande() != null){
+            new Button("Terminer commande", new Runnable() {
+                @Override
+                public void run() {
+                    Order ord = getDbQueries().getOrderFromTable(table.getCommande());
+                    getDbQueries().addEndDateToOrder(table);
+                    table.setEtat("débarassée");
+                    getDbQueries().updateTableDebarassee(table);
+                    getDbQueries().removeOrderFromTable(table);
+                    Screen();
+                }
+            }).addTo(panel);
+        }
+
         panel.addComponent(new EmptySpace());
+
+        BasicWindow window = new BasicWindow();
+        window.setComponent(panel);
+        try {
+            MainTerminal.getConsole().switchWindow(window);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+
+    /**
+     * Affiche la fenêtre terminale de la commande courante à une table donné
+     * @param table (type Table)
+     */
+    public void orderEntryScreen(Table table){
+
+        ArrayList<ComboBox<String>> ingredientsList = new ArrayList<>();
+        Panel panel = new Panel();
+        panel.setLayoutManager(new GridLayout(3));
+        panel.addComponent(new EmptySpace());
+
+        new Button("Retour", new Runnable() {
+            @Override
+            public void run() {
+                screenInfosTable(table);
+            }
+        }).addTo(panel);
+        emptySpace(panel);
+
+        panel.addComponent(new Label("Commande : "));
+        emptySpace(panel);
+
+        panel.addComponent(new Label("Catégorie du plat :"));
+        emptySpace(panel);
+
+        ComboBox<String> cat = getCategoriesComboBox(); // On ajoute dans la combobox les catégories de plats
+        if(cat != null){
+            cat.setSelectedIndex(0);
+            panel.addComponent(cat);
+        }
+        else {
+            panel.addComponent(new Label("Aucunes catégories de disponible "));
+        }
+
+        emptySpace(panel);
+
+        Panel panSecond = new Panel();
+        panel.addComponent(panSecond);
+
+        //Listener pour exécuter un morceau de code dés qu'on sélectionne une catégorie
+
+        if(cat != null){
+            cat.addListener(new ComboBox.Listener() {
+                @Override
+                public void onSelectionChanged(int selectedIndex, int previousSelection, boolean changedByUserInteraction) {
+                    String selected = cat.getSelectedItem();
+                    getDishes(selected,panSecond,table);
+                }
+            });
+        }
+
+
 
         BasicWindow window = new BasicWindow();
         window.setComponent(panel);
@@ -155,76 +228,105 @@ public class Waiter extends Staff {
 
 
     /**
-     * Affiche la fenêtre terminale de la commande courante à une table donné
-     * @param table (type Table)
+     * Récupère les catégories disponibles et les ajoutes dans une ComboBox
+     * @return categories
      */
-    public void orderEntryScreen(Table table){
-        ArrayList<ComboBox<String>> ingredientsList = new ArrayList<>();
-        Panel panel = new Panel();
-        panel.setLayoutManager(new GridLayout(1));
-
-        panel.addComponent(new EmptySpace());
-
-        panel.addComponent(new Label("Commande : "));
-
-        //On récupère pas la commande pour le client
-        /*if(table.getOrder() != null){
-            for (Preparation p : table.getOrder().getPreparation()){
-                panel.addComponent(new Label(p.Plat));
-            }
-
-        else{
-            Order ord = new Order();
-        }
-        }*/
-        panel.addComponent(new EmptySpace());
-
-        panel.addComponent(new Label("Catégorie du plat :"));
-        ComboBox<String>categories = categoriesComboBox().addTo(panel);
-
-
-
-        new Button("Retour", new Runnable() {
-            @Override
-            public void run() {
-                screenInfosTable(table);
-            }
-        }).addTo(panel);
-
-        new Button("Valider ajout", new Runnable() {
-            @Override
-            public void run() {
-               // getDbQueries().newPreparation();
-                orderEntryScreen(table);
-            }
-        }).addTo(panel);
-
-        new Button("Terminer commande", new Runnable() {
-            @Override
-            public void run() {
-                //getDbQueries().updateOrder(table.getOrder());
-                Screen();
-            }
-        }).addTo(panel);
-
-        BasicWindow window = new BasicWindow();
-        window.setComponent(panel);
-        try {
-            MainTerminal.getConsole().switchWindow(window);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-
-    private ComboBox<String> categoriesComboBox(){
+    private ComboBox<String> getCategoriesComboBox(){
         ComboBox<String> categories = new ComboBox<String>();
-        for(Categorie c : super.getDbQueries().getCategories()){
-            categories.addItem(c.nom);
+        for(String c : getDbQueries().getCategoriesWithAtLeastOneDishAvailable()){
+            categories.addItem(c);
+        }
+        if(categories.getItemCount() == 0){
+            return null;
         }
         return categories;
     }
+
+
+    /**
+     * Récupère et ajoute les plats à un panel donné
+     * @param cat
+     * @param panel
+     * @param table
+     */
+    private void getDishes(String cat, Panel panel,Table table){
+        panel.removeAllComponents();
+        panel.setLayoutManager(new GridLayout(3));
+        panel.addComponent(new EmptySpace());
+        emptySpace(panel);
+        for(Cook.Plat plat : super.getDbQueries().getDishesAvailable(cat)) {
+            panel.addComponent(new Label(plat.nom + " : " + plat.prix + " €"));;
+            CheckBox check = new CheckBox("Menu enfant ?");
+            panel.addComponent(check);
+            ajouterCommande(check, table, plat).addTo(panel);
+        }
+
+        panel.addComponent(new EmptySpace());
+    }
+
+    /**
+     *
+     * @param checkBox
+     * @param table
+     * @param plat
+     * @return
+     */
+    private Button ajouterCommande(CheckBox checkBox, Table table, Cook.Plat plat){
+        return new Button("Ajouter produit", new Runnable() {
+            @Override
+            public void run() {
+                checkAndActOnTheOrder(table,plat,checkBox);
+                screenInfosTable(table);
+            }
+        });
+    }
+
+    /**
+     * Faire des empty space (utile pour les layout à 2 colonnes)
+     * @param panel
+     */
+    public void emptySpace(Panel panel){
+        panel.addComponent(new EmptySpace());
+        panel.addComponent(new EmptySpace());
+    }
+
+
+    /**
+     * Regarde si une commande existe et effectue des opérations si oui ou si non
+     */
+    public void checkAndActOnTheOrder(Table table, Cook.Plat plat,CheckBox checkBox){
+        Preparation p = null;
+        if(checkBox.isChecked())
+             p = new Preparation(new ObjectId(),false, plat._id, true);
+        else
+             p = new Preparation(new ObjectId(),false, plat._id, false);
+
+        if(table.getCommande() == null){
+            Order ord = new Order(new ObjectId(), plat.prix);
+            getDbQueries().newPreparation(p);
+            ord.getPreparation().add(p._id);
+            getDbQueries().newOrder(ord);
+            getDbQueries().addOrderToTable(table, ord.get_id());
+            updateStockIngredient(plat);
+            //faire un if menu enfant
+        }
+        else{
+            getDbQueries().newPreparation(p);
+            Order ord = getDbQueries().getOrderFromTable(table.getCommande());
+            ord.getPreparation().add(p._id);
+            ord.setMontant(ord.getMontant().doubleValue() + plat.prix);
+            getDbQueries().updateOrder(ord);
+            updateStockIngredient(plat);
+        }
+    }
+
+    public void  updateStockIngredient(Cook.Plat plat){
+        for (String ing : plat.Ingredient) {
+            getDbQueries().updateIngredient(getDbQueries().getIngredient(ing).getObjectId("_id"),
+                    getDbQueries().getIngredient(ing).getInteger("stock").intValue()-1);
+        }
+    }
+
 
 }
 
