@@ -9,6 +9,7 @@ import org.bson.types.ObjectId;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -68,6 +69,7 @@ public class Director extends Staff {
         buttonPreparationMoyen().addTo(panel);
         buttonCADejDiner().addTo(panel);
         buttonPartRecette().addTo(panel);
+        buttonAnalyseVente().addTo(panel);
         setupWindowAndSwitch(panel,"",1);
         return panel;
     }
@@ -668,6 +670,11 @@ public class Director extends Staff {
             }
         });
     }
+
+    /**
+     * Permet d'afficher un boutton qui va rediriger vers le panel de rotation moyen
+     * @return
+     */
     private Button buttonRotationMoyen(){
         return new Button("Voir le temps de rotation moyen des clients", new Runnable() {
             @Override
@@ -681,29 +688,39 @@ public class Director extends Staff {
         });
     }
 
+    /**
+     * Affiche un panel qui va calculer le temps de rotation moyen
+     * @return
+     * @throws ParseException
+     * @throws ParseException
+     */
     private Panel panelRotationMoyen() throws ParseException, ParseException {
         Panel panel = new Panel();
-        mainMenu().addTo(panel);
+        mainMenu().addTo(panel); //Afiche le boutton de retour au menu
 
         Long temps = null;
-        int tempsMoyen = 0;
-        int compteur = 0;
+        int tempsMoyen = 0; //Stocke le temps moyen
+        int compteur = 0; //Compte le nombre de commandes
         SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         List<Order> commandes = getDbQueries().getAllCommandes();
         for(Order c : commandes){
-            if(c.getDateFin()!= null && !c.getDateFin().equals("")){
-                temps = SDF.parse(c.getDateFin()).getTime()-(SDF.parse(c.getDateDebut())).getTime();
-                tempsMoyen += temps;
-                compteur++;
+            if(c.getDateFin()!= null && !c.getDateFin().equals("")){ //Si la commande est bien terminée
+                temps = SDF.parse(c.getDateFin()).getTime()-(SDF.parse(c.getDateDebut())).getTime(); //On parse en date et on récupère la différence des 2 dates
+                tempsMoyen += temps; //On ajoute au temps moyen le temps calculé avant
+                compteur++; //On incrémente le compeur
             }
 
         }
-        tempsMoyen = tempsMoyen/compteur;
+        tempsMoyen = tempsMoyen/compteur; //Pour avoir le temps moyen, on prend le temp moyen qu'on divise par le compteur qui représente le nb de commande
         panel.addComponent(new Label("Le temps de rotation moyen des clients est de :"));
-        panel.addComponent(new Label((tempsMoyen%86400000)/3600000+" heures, "+((tempsMoyen%86400000)%3600000)/60000+" minutes et "+(((tempsMoyen%86400000)%3600000)%60000)/1000+" secondes"));
+        panel.addComponent(new Label((tempsMoyen%86400000)/3600000+" heures, "+((tempsMoyen%86400000)%3600000)/60000+" minutes et "+(((tempsMoyen%86400000)%3600000)%60000)/1000+" secondes")); //On effectue un calcul pour avoir précisement le temps moyen
         return panel;
     }
 
+    /**
+     * Permet d'afficher un boutton qui va rediriger vers le panel de préparation moyen
+     * @return
+     */
     private Button buttonPreparationMoyen(){
         return new Button("Voir le temps de préparation moyen des cuisiniers", new Runnable() {
             @Override
@@ -717,29 +734,39 @@ public class Director extends Staff {
         });
     }
 
+    /**
+     * Permet d'afficher le temps de préparation moyen
+     * @return
+     * @throws ParseException
+     * @throws ParseException
+     */
     private Panel panelPreparationMoyen() throws ParseException, ParseException {
         Panel panel = new Panel();
         mainMenu().addTo(panel);
 
         Long temps = null;
-        int tempsMoyen = 0;
-        int compteur = 0;
+        int tempsMoyen = 0; //Va stocker le temps moyen
+        int compteur = 0; //Va compter le nombre de préparation
         SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        List<Preparation> preparations = getDbQueries().getPreparationsEnCours();
-        for(Preparation c : preparations){
-            if(c.fin!= null && !c.fin.equals("")){
-                temps = SDF.parse(c.fin).getTime()-(SDF.parse(c.heureCommande)).getTime();
+        List<Preparation> preparations = getDbQueries().getPreparationsEnCours(); //Récupère toutes les préparations qui ont au moin commencé à étre préparé
+        for(Preparation c : preparations){ //On parcoure les préparations
+            if(c.fin!= null && !c.fin.equals("")){ //Si la preparation est finie
+                temps = SDF.parse(c.fin).getTime()-(SDF.parse(c.heureCommande)).getTime(); //On parse la date et on stocke la différence entre les 2 dates
                 tempsMoyen += temps;
-                compteur++;
+                compteur++; //On incrémente le compteur
             }
 
         }
-        tempsMoyen = tempsMoyen/compteur;
+        tempsMoyen = tempsMoyen/compteur; //On calcul le temps moyen en reprenant le temps moyen et en le divisant par le nombre de preparation
         panel.addComponent(new Label("Le temps de préparation moyen des cuisiniers est de :"));
         panel.addComponent(new Label((tempsMoyen%86400000)/3600000+" heures, "+((tempsMoyen%86400000)%3600000)/60000+" minutes et "+(((tempsMoyen%86400000)%3600000)%60000)/1000+" secondes"));
         return panel;
     }
 
+    /**
+     * Permet d'afficher un boutton qui va rediriger vers le panel CA du déjeuner et du diner
+     * @return
+     */
     private Button buttonCADejDiner(){
         return new Button("Voir le CA du déjeuner et du diner", new Runnable() {
             @Override
@@ -753,13 +780,18 @@ public class Director extends Staff {
         });
     }
 
+    /**
+     * Permet d'afficher le CA du déjeuner et du diner
+     * @return
+     * @throws ParseException
+     */
     private Panel panelCADejDiner() throws ParseException {
         Panel panel = new Panel();
         mainMenu().addTo(panel);
 
-        Date dateDejeunerDebut = new SimpleDateFormat("HH:mm:ss").parse("12:00:00");
+        Date dateDejeunerDebut = new SimpleDateFormat("HH:mm:ss").parse("12:00:00"); //On définit les dates du déjeuner
         Date dateDejeunerFin = new SimpleDateFormat("HH:mm:ss").parse("14:00:00");
-        Date dateDinerDebut = new SimpleDateFormat("HH:mm:ss").parse("18:00:00");
+        Date dateDinerDebut = new SimpleDateFormat("HH:mm:ss").parse("18:00:00"); // et du diner
         Date dateDinerFin = new SimpleDateFormat("HH:mm:ss").parse("20:00:00");
         int CAdej = 0;
         int CAdiner = 0;
@@ -767,24 +799,27 @@ public class Director extends Staff {
         List<Order> commandes = getDbQueries().getAllCommandes();
 
         for(Order c : commandes){
-            if(c.getDateFin()!= null && !c.getDateFin().equals("")){
-                Date debut = SDF.parse(c.getDateDebut());
+            if(c.getDateFin()!= null && !c.getDateFin().equals("")){ //Si la commande est bien terminée
+                Date debut = SDF.parse(c.getDateDebut()); //On parse les dates
                 Date fin = SDF.parse(c.getDateFin());
-                if(debut.getHours() >= dateDejeunerDebut.getHours() && fin.getHours() <= dateDejeunerFin.getHours()){
+                if(debut.getHours() >= dateDejeunerDebut.getHours() && fin.getHours() <= dateDejeunerFin.getHours()){ //On vérifie si la date est comprise entre la date du déjeuner de debut et fin
                     CAdej += c.getMontant();
                 }
-                if(debut.getHours() >= dateDinerDebut.getHours() && fin.getHours() <= dateDinerFin.getHours()){
+                if(debut.getHours() >= dateDinerDebut.getHours() && fin.getHours() <= dateDinerFin.getHours()){ //On vérifie si la date est comprise entre la date du diner de début et fin
                     CAdiner += c.getMontant();
                 }
             }
 
         }
-
         panel.addComponent(new Label("Le CA du déjeuner (12h - 15h) est de "+ CAdej + " euros"));
         panel.addComponent(new Label("Le CA du diner (18h - 21h) est de " + CAdiner + " euros"));
         return panel;
     }
 
+    /**
+     * Permet d'afficher un boutton qui va rediriger vers le panel de la part recette
+     * @return
+     */
     private Button buttonPartRecette(){
         return new Button("Consulter les parts de recette de chaque plat", new Runnable() {
             @Override
@@ -798,36 +833,207 @@ public class Director extends Staff {
         });
     }
 
+    /**
+     * Affiche un panel qui va permettre d'afficher les pars de recette générés par plats
+     * @return
+     * @throws ParseException
+     */
     private Panel panelPartRecette() throws ParseException {
         Panel panel = new Panel();
         mainMenu().addTo(panel);
         panel.addComponent(new Label("Parts de recette générées par plats"));
-        Map<String, Double> produitPrix = new HashMap<>();
-        List<Order> commandes = getDbQueries().getAllCommandes();
+        Map<String, Double> produitPrix = new HashMap<>(); //Créer une map pour stocker les plats et leurs montant
+        List<Order> commandes = getDbQueries().getAllCommandes(); //On récupère toutes les commandes
 
         for(Order c : commandes){
-            if(c.getDateFin()!= null && !c.getDateFin().equals("")){
-                for(Preparation p : getDbQueries().getPreparationID(c.getPreparation())){
-                    if(p.debut && p.fin != null){
-                        System.out.println(p.Plat);
-                        Cook.Plat plat = getDbQueries().getPlat(p.Plat);
-                        if(produitPrix.containsKey(plat.nom)){
-                            double montant = produitPrix.get(plat.nom) + plat.prix;
-                            produitPrix.put(plat.nom, montant);
+            if(c.getDateFin()!= null && !c.getDateFin().equals("")){ //On vérifie que la commande est bien termintée
+                for(Preparation p : getDbQueries().getPreparationID(c.getPreparation())){  //On va récupérer une liste de préparation à partir d'une liste d'object id et on boucle dessus
+                    if(p.debut && p.fin != null){ //Si la preparation est bien terminée
+                        Cook.Plat plat = getDbQueries().getPlat(p.Plat); //On récupère un object plat avec l'objectId
+                        if(produitPrix.containsKey(plat.nom)){ //On regarde si le nom du plat existe déjà dans le hashmap
+                            double montant = produitPrix.get(plat.nom) + plat.prix; //Si oui on récupère le montant et on ajoute le prix du plat
+                            produitPrix.put(plat.nom, montant); //On met a jour dans le hashmap
                         }
-                        else{
-                            produitPrix.put(plat.nom, plat.prix);
+                        else{ //Si non
+                            produitPrix.put(plat.nom, plat.prix); //On ajoute dans le hashmap
                         }
                     }
                 }
 
             }
         }
-
-        for(Map.Entry entry : produitPrix.entrySet()){
+        for(Map.Entry entry : produitPrix.entrySet()){ //On parcoure le hashmap
             panel.addComponent(new Label("   - " +entry.getKey() + " a générer " + entry.getValue() + " €"));
         }
+        return panel;
+    }
 
+    /**
+     * Permet d'afficher un boutton qui va rediriger vers le panel de l'analyse de vente
+     * @return
+     */
+    private Button buttonAnalyseVente(){
+        return new Button("Analyse des ventes", new Runnable() {
+            @Override
+            public void run() {
+                setupWindowAndSwitch(panelRecette(),"",1);
+            }
+        });
+    }
+
+    /**
+     * Affiche un panel qui va permettre d'afficher des boutons pour consulter la recette quotidienne, hebdomadaire et mensuelle.
+     * @return
+     */
+    private Panel panelRecette()  {
+        Panel panel = new Panel();
+        mainMenu().addTo(panel);
+        new Button("Recette quotidienne", new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    setupWindowAndSwitch(panelRecetteQuotidienne(),"",1);
+                } catch (ParseException e) {
+
+                }
+            }
+        }).addTo(panel);
+        new Button("Recette hebdomadaire", new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    setupWindowAndSwitch(panelRecetteHebdomadaire(),"",1);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).addTo(panel);
+        new Button("Recette mensuelle", new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    setupWindowAndSwitch(panelRecetteMensuelle(),"",1);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).addTo(panel);
+        return panel;
+    }
+
+    /**
+     * Permet d'afficher la recette quotidienne
+     * @return
+     * @throws ParseException
+     */
+    private Panel panelRecetteQuotidienne() throws ParseException {
+        Panel panel = new Panel();
+        mainMenu().addTo(panel);
+        panel.addComponent(new Label("Recette quotidienne : "));
+        Map<String, Double> recettes = new HashMap<>(); //Initialisation du hashmap pour stocker la date et le montant
+        List<Order> commandes = getDbQueries().getAllCommandes(); //On récupère toutes les commandes
+
+        for(Order c : commandes) {
+            if (c.getDateFin() != null && !c.getDateFin().equals("")) { //On vérifie que la commande est bien terminée.
+                String debut = c.getDateDebut().split(" ")[0]; //On split sur la date pour récupérer juste la date sans le temps.
+                if(recettes.containsKey(debut)){ //Si la date est contenue dans le hashmap
+                    double montant = c.getMontant() + recettes.get(debut);
+                    recettes.put(debut, montant);
+                }
+                else{
+                    recettes.put(debut, c.getMontant());
+                }
+            }
+        }
+
+        Map sortedMap = new TreeMap(recettes); //Permet de trier par le jour dans la date
+        Set set2 = sortedMap.entrySet();
+        Iterator iterator2 = set2.iterator();
+        while(iterator2.hasNext()) {
+            Map.Entry me2 = (Map.Entry)iterator2.next();
+            panel.addComponent(new Label("   - " +me2.getKey() + " : " + me2.getValue() + " €"));
+        }
+        return panel;
+
+    }
+    /**
+     * Permet d'afficher la recette hebdomadaire
+     * @return
+     * @throws ParseException
+     */
+    private Panel panelRecetteHebdomadaire() throws ParseException {
+        Panel panel = new Panel();
+        mainMenu().addTo(panel);
+        Map<Integer, Double> recettes = new HashMap<>(); //Initialisation du hashmap pour stocker la date et le montant
+        List<Order> commandes = getDbQueries().getAllCommandes(); //On récupère toutes les commandes
+        Calendar gc = Calendar.getInstance(); //On utilise l'object calendar pour les dates
+        String format = "dd-MM-yyyy"; //On définit le format de la date
+
+        for(Order c : commandes) {
+            if (c.getDateFin() != null && !c.getDateFin().equals("")) { //On vérifie que la commande est bien terminée.
+                String date = c.getDateDebut().split(" ")[0]; //Alors on split sur la date pour récupérer que la date et pas l'heure
+                DateFormat df = new SimpleDateFormat(format); //On initialise la date avec le format
+                Date dateCommande = df.parse(date); //On parse la date par rapport au format
+                gc.setTime(dateCommande); // On met la date dans le calendrier
+                int numSemaine = gc.get(Calendar.WEEK_OF_YEAR); //Permet de récupérer le numero de la semaine
+
+                if(recettes.containsKey(numSemaine)){ //Si la date est contenue dans le hashmap
+                    double montant = c.getMontant() + recettes.get(numSemaine);
+                    recettes.put(numSemaine, montant);
+                }
+                else{
+                    recettes.put(numSemaine, c.getMontant());
+                }
+            }
+        }
+
+        Map sortedMap = new TreeMap(recettes); //Permet de trier par le numero de la semaine
+        Set set2 = sortedMap.entrySet();
+        Iterator iterator2 = set2.iterator();
+        while(iterator2.hasNext()) {
+            Map.Entry me2 = (Map.Entry)iterator2.next();
+            panel.addComponent(new Label("   - Semaine " +me2.getKey() + " : " + me2.getValue() + " €"));
+        }
+        return panel;
+
+    }
+
+    /**
+     * Permet d'afficher la recette mensuelle
+     * @return
+     * @throws ParseException
+     */
+    private Panel panelRecetteMensuelle() throws ParseException {
+        Panel panel = new Panel();
+        mainMenu().addTo(panel);
+        panel.addComponent(new Label("Recette mensuelle : "));
+        Map<String, Double> recettes = new HashMap<>(); //Initialisation du hashmap pour stocker la date et le montant
+        SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd");
+        List<Order> commandes = getDbQueries().getAllCommandes(); //On récupère toutes les commandes
+
+        for(Order c : commandes) {
+            if (c.getDateFin() != null && !c.getDateFin().equals("")) { //Si la commande est bien terminée
+                String date = c.getDateDebut().split(" ")[0]; //Alors on split sur la date pour récupérer que la date et pas l'heure
+                String mois = date.split("-")[1]; //On split pour récupérer le mois
+                String annee = date.split("-")[2]; //On split pour récupérer l'année
+                String debut = mois + "/" + annee;
+                if(recettes.containsKey(debut)){ //Si le mois et l'année sont contenu dans le hashmap
+                    double montant = c.getMontant() + recettes.get(debut);
+                    recettes.put(debut, montant);
+                }
+                else{
+                    recettes.put(debut, c.getMontant());
+                }
+            }
+        }
+
+        Map sortedMap = new TreeMap(recettes); //Permet de trier par mois
+        Set set2 = sortedMap.entrySet();
+        Iterator iterator2 = set2.iterator();
+        while(iterator2.hasNext()) {
+            Map.Entry me2 = (Map.Entry)iterator2.next();
+            panel.addComponent(new Label("   - " +me2.getKey() + " : " + me2.getValue() + " €"));
+        }
         return panel;
     }
 }
