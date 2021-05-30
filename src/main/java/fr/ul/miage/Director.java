@@ -67,6 +67,7 @@ public class Director extends Staff {
         buttonRotationMoyen().addTo(panel);
         buttonPreparationMoyen().addTo(panel);
         buttonCADejDiner().addTo(panel);
+        buttonPartRecette().addTo(panel);
         setupWindowAndSwitch(panel,"",1);
         return panel;
     }
@@ -752,7 +753,7 @@ public class Director extends Staff {
         });
     }
 
-    private Panel panelCADejDiner() throws ParseException, ParseException {
+    private Panel panelCADejDiner() throws ParseException {
         Panel panel = new Panel();
         mainMenu().addTo(panel);
 
@@ -773,8 +774,6 @@ public class Director extends Staff {
                     CAdej += c.getMontant();
                 }
                 if(debut.getHours() >= dateDinerDebut.getHours() && fin.getHours() <= dateDinerFin.getHours()){
-                    System.out.println(c.get_id());
-                    System.out.println(debut.getHours());
                     CAdiner += c.getMontant();
                 }
             }
@@ -783,6 +782,52 @@ public class Director extends Staff {
 
         panel.addComponent(new Label("Le CA du déjeuner (12h - 15h) est de "+ CAdej + " euros"));
         panel.addComponent(new Label("Le CA du diner (18h - 21h) est de " + CAdiner + " euros"));
+        return panel;
+    }
+
+    private Button buttonPartRecette(){
+        return new Button("Consulter les parts de recette de chaque plat", new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    setupWindowAndSwitch(panelPartRecette(),"",1);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    private Panel panelPartRecette() throws ParseException {
+        Panel panel = new Panel();
+        mainMenu().addTo(panel);
+        panel.addComponent(new Label("Parts de recette générées par plats"));
+        Map<String, Double> produitPrix = new HashMap<>();
+        List<Order> commandes = getDbQueries().getAllCommandes();
+
+        for(Order c : commandes){
+            if(c.getDateFin()!= null && !c.getDateFin().equals("")){
+                for(Preparation p : getDbQueries().getPreparationID(c.getPreparation())){
+                    if(p.debut && p.fin != null){
+                        System.out.println(p.Plat);
+                        Cook.Plat plat = getDbQueries().getPlat(p.Plat);
+                        if(produitPrix.containsKey(plat.nom)){
+                            double montant = produitPrix.get(plat.nom) + plat.prix;
+                            produitPrix.put(plat.nom, montant);
+                        }
+                        else{
+                            produitPrix.put(plat.nom, plat.prix);
+                        }
+                    }
+                }
+
+            }
+        }
+
+        for(Map.Entry entry : produitPrix.entrySet()){
+            panel.addComponent(new Label("   - " +entry.getKey() + " a générer " + entry.getValue() + " €"));
+        }
+
         return panel;
     }
 }
