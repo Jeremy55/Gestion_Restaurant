@@ -229,6 +229,61 @@ public class DBQueriesTest {
         assertNotNull(preparationsDoc);
     }
 
+    @Test
+    void testGetAllStaff(){
+        List<Staff> staff = dbQueries.getAllStaff();
+        assertNotNull(staff);
+    }
+
+    @Test
+    void testUpdateIngredient(){
+        ObjectId id = new ObjectId("60abb2932c03d0110c9c8e74");
+        dbQueries.updateIngredient(id, 40);
+        MongoCollection<Document> collection = dbQueries.database.getCollection("Ingredient");
+        Document doc = collection.find(eq("_id", id)).first();
+        assertEquals(doc.get("stock"), 40);
+    }
+
+    @Test
+    void testGetAllPlat(){
+        List<Cook.Plat> plats = dbQueries.getAllPlats();
+        assertNotNull(plats);
+    }
+
+    @Test
+    void testModifierPlat(){
+        ObjectId id = new ObjectId("60abe3eb93ddd7520a179993");
+        Cook.Plat p = dbQueries.getPlat(new ObjectId("60abe3eb93ddd7520a179993"));
+        dbQueries.modifierPlat(p, true);
+        MongoCollection<Document> collection = dbQueries.database.getCollection("Plat");
+        Document doc = collection.find(eq("_id", id)).first();
+        assertEquals(doc.get("platDuJour"), true);
+    }
+
+    @Test
+    void testModificationEmploye(){
+        Staff f = dbQueries.getStaff("jpierre");
+        dbQueries.modificationEmploye(f.getId(), f.getLogin(), f.getMdp(), "pierrot", f.getPrenom(), "cuisinier", null);
+        MongoCollection<Document> collection = dbQueries.database.getCollection("Personnel");
+        Document doc = collection.find(eq("login", f.getLogin())).first();
+        assertEquals(doc.get("nom"), "pierrot");
+    }
+
+    @Test
+    void testGetAllCommande(){
+        List<Order> commande = dbQueries.getAllCommandes();
+        assertNotNull(commande);
+    }
+
+    @Test
+    void testGetPreparationID(){
+        ObjectId id = new ObjectId("60b3827999a1174c2ae535bc");
+        List<ObjectId> listeID = new ArrayList<>();
+        listeID.add(id);
+        List<Preparation> prep = dbQueries.getPreparationID(listeID);
+        assertEquals(prep.get(0)._id, id);
+    }
+
 
 
 

@@ -434,7 +434,7 @@ public class DBQueries {
      * Permet de modifier un employé
      * @return
      */
-    public void modificationEmploye(ObjectId id, String login, String mdp, String nom, String prenom, String role, List<Table> tablesA){
+    public void modificationEmploye(ObjectId id, String login, String mdp, String nom, String prenom, String role, List<Table> tablesAffectes){
         MongoCollection<Document> collectionEmploye = database.getCollection("Personnel");
         Document query = new Document().append("_id", id);
         Document employe = collectionEmploye.find(eq("_id", id)).first();
@@ -447,7 +447,7 @@ public class DBQueries {
         setData.append("role", role);
         List<ObjectId> tableID = new ArrayList<>();
         if(role.equals("serveur")){ //Si c'est un serveur
-            for(Table e : tablesA){
+            for(Table e : tablesAffectes){
                 tableID.add(e.get_id());
             }
             setData.append("Table", tableID); //Alors on modifie ses tables affectés
