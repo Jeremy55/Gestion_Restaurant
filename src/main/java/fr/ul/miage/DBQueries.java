@@ -313,4 +313,18 @@ public class DBQueries {
         update.append("$set",setData);
         collectionTable.updateOne(query,update);
     }
+
+    /**
+     * Récupérer une table à partir de son oid
+     * @param oid
+     * @return table
+     */
+    public Table getTable(ObjectId oid){
+        MongoCollection<Document> collectionTable = database.getCollection("Table");
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        Document doc = collectionTable.find(eq("_id",oid)).first();
+        Table table = gson.fromJson(doc.toJson(),Table.class);
+        table.set_id(oid);
+        return table;
+    }
 }

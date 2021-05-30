@@ -12,6 +12,8 @@ import org.bson.types.ObjectId;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class Waiter extends Staff {
     private List<ObjectId> Table;
@@ -117,11 +119,18 @@ public class Waiter extends Staff {
     public void screenInfosTable(Table table){
         Panel panel = super.deconnection();
         panel.addComponent(new EmptySpace());
-        panel.addComponent(new Label(table.toString()));
+        Panel panelInfo = new Panel();
+        panelInfo.addComponent(new Label(table.toString()));
+        panel.addComponent(panelInfo);
+        Timer timer = new Timer();
+        tempsReelInfosTable(panelInfo, table.get_id(), timer);
+
+        emptySpace(panel);
 
         new Button("Retour", new Runnable() {
             @Override
             public void run() {
+                timer.cancel();
                 Screen();
             }
         }).addTo(panel);
@@ -130,6 +139,7 @@ public class Waiter extends Staff {
             new Button("Ajouter plat", new Runnable() {
                 @Override
                 public void run() {
+                    timer.cancel();
                     orderEntryScreen(table);
                 }
             }).addTo(panel);
@@ -160,7 +170,22 @@ public class Waiter extends Staff {
         }
     }
 
-
+    /**
+     * Affichage des informations de la table en temps réel
+     * @param panel
+     * @param oidTables
+     * @param lbl
+     * @param timer
+     */
+    private void tempsReelInfosTable(Panel panel, ObjectId oidTables, Timer timer){
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                panel.removeAllComponents();
+                panel.addComponent(new Label(getDbQueries().getTable(oidTables).toString()));
+            }
+        }, 0, 4000);
+    }
 
 
     /**
