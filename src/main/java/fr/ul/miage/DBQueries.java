@@ -19,7 +19,7 @@ import java.util.List;
 
 public class DBQueries {
 
-    private final MongoDatabase database;
+    final MongoDatabase database;
 
     public DBQueries(){
         MongoClient mongoClient = MongoClients.create("mongodb+srv://admin:qFoOXXTZeYMRcihb@cluster0.vfnf9.mongodb.net/GestionRestaurant?retryWrites=true&w=majority");
