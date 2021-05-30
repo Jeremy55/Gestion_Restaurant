@@ -463,7 +463,7 @@ public class DBQueries {
 
     /**
      * Cette méthode permet de récupérer toutes les commandes
-     * @return une liste de Table
+     * @return une liste de commandes
      */
     public List<Order> getAllCommandes(){
         MongoCollection<Document> collectionCommande = database.getCollection("Commande");
@@ -471,13 +471,40 @@ public class DBQueries {
         FindIterable<Document> commandeAll =  collectionCommande.find(); //On récupère toutes les commande
 
         List<Order> commandes = new ArrayList<>();
+
         for(Document doc : commandeAll){
             Order a = gson.fromJson(doc.toJson(),Order.class); //On transforme les documents en commande
             a.set_id(doc.getObjectId("_id"));
+            List<ObjectId> prepID = (List<ObjectId>) doc.get("Preparation");
+            a.setPreparation(prepID);
             commandes.add(a);
-        }
+            }
         return commandes;
     }
+
+    /**
+     * Cette méthode permet de récupérer une liste de preparation grâce a une liste d'object ID
+     * @return une liste de preparation
+     */
+    public List<Preparation> getPreparationID(List<ObjectId> idPrep){
+        MongoCollection<Document> collectionPreparation = database.getCollection("Preparation");
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        List<Preparation> prep = new ArrayList<>();
+        for(ObjectId id : idPrep){
+            Document prepDoc =  collectionPreparation.find(eq("_id", id)).first(); //On récupère la préparation qui correspond a l'id
+
+            if(prepDoc == null){
+                return new ArrayList<>();
+            }
+            Preparation a = gson.fromJson(prepDoc.toJson(), Preparation.class); //On transforme le document en preparation
+            a._id = prepDoc.getObjectId("_id");
+            a.Plat = (ObjectId) prepDoc.get("Plat");
+            prep.add(a);
+        }
+
+        return prep;
+    }
+
 
 
 }

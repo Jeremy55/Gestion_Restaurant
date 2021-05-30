@@ -9,7 +9,7 @@ public class Order {
     private ObjectId _id;
     private String dateDebut;
     private String dateFin;
-    private List<Preparation> Preparation;
+    private List<ObjectId> Preparation;
     private Double montant;
 
     public Order(ObjectId _id, String dateDebut, String dateFin, Double montant) {
@@ -17,7 +17,7 @@ public class Order {
         this.dateDebut = dateDebut;
         this.dateFin = dateFin;
         this.montant = montant;
-        Preparation = new ArrayList<Preparation>();
+        Preparation = new ArrayList<ObjectId>();
     }
 
     public ObjectId get_id() {
@@ -44,11 +44,11 @@ public class Order {
         this.dateFin = dateFin;
     }
 
-    public List<fr.ul.miage.Preparation> getPreparation() {
+    public List<ObjectId> getPreparation() {
         return Preparation;
     }
 
-    public void setPreparation(List<fr.ul.miage.Preparation> preparation) {
+    public void setPreparation(List<ObjectId> preparation) {
         Preparation = preparation;
     }
 

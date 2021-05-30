@@ -57,7 +57,6 @@ public class DBQueriesTest {
     void testGetServiceAssistant()
     {
         Staff s = dbQueries.getStaff("aservice");
-        System.out.println(s.getClass());
         assertEquals(s.getClass(), ServiceAssistant.class);
     }
 
