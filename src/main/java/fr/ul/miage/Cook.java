@@ -141,6 +141,7 @@ public class Cook extends Staff {
      */
     private Panel panelBackLogPreparations(){
         Panel panel = new Panel();
+        buttonReturnMainmenu().addTo(panel);
         ArrayList<Preparation> sortedPreparations = orderPreparations(getDbQueries().getPreparations());
         for(Preparation p : sortedPreparations){
             buttonStartPreparation(p).addTo(panel);
