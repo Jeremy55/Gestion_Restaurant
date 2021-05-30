@@ -73,40 +73,51 @@ public class ServiceAssistant extends Staff {
      * @return
      */
     public BasicWindow DebarasserTable(Label lbl) {
-        Panel panel = super.deconnection();
+        Panel panel = new Panel();
         Label lblOutput = lbl;
-        new Button("Rafraichir la fenêtre", new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    MainTerminal.getConsole().switchWindow(DebarasserTable(new Label("")));
-                } catch (IOException ioException) {
-                    ioException.printStackTrace();
-                }
-            }
-        }).addTo(panel);
+        Timer timer = new Timer();
+
         panel.setLayoutManager(new GridLayout(1));
         panel.addComponent(new EmptySpace());
-        panel.addComponent(new Label("Menu assistant de service").addStyle(SGR.BOLD));
-        panel.addComponent(lblOutput.setBackgroundColor(TextColor.ANSI.GREEN));
-        List<Table> table = getDbQueries().getAllTable();
-        for(Table e : table){
-            panel.addComponent(new Label(" - Table n°" + e.getNumero() + ", étage : " + e.getEtage() +", état : " + e.getEtat()));
-            if(e.getEtat().equals("débarassée")){
-                new Button("Débarasser la table n° " + e.getNumero(), new Runnable() {
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                panel.removeAllComponents();
+                new Button("Déconnection", new Runnable() {
                     @Override
                     public void run() {
                         try {
-                            MainTerminal.getConsole().switchWindow(DresserTable(e, lblOutput));
-                        } catch (IOException ioException) {
-                            ioException.printStackTrace();
+                            timer.cancel();
+                            LoginScreen loginScreen = new LoginScreen();
+                            MainTerminal.getConsole().switchWindow(loginScreen);
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
                     }
                 }).addTo(panel);
+                panel.addComponent(new Label("Menu assistant de service").addStyle(SGR.BOLD));
+                panel.addComponent(lblOutput.setBackgroundColor(TextColor.ANSI.GREEN));
+                List<Table> table = getDbQueries().getAllTable();
+                for (Table e : table) {
+                    panel.addComponent(new Label(" - Table n°" + e.getNumero() + ", étage : " + e.getEtage() + ", état : " + e.getEtat()));
+                    if (e.getEtat().equals("débarassée")) {
+                        new Button("Débarasser la table n° " + e.getNumero(), new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    timer.cancel();
+                                    MainTerminal.getConsole().switchWindow(DresserTable(e, lblOutput));
+                                } catch (IOException ioException) {
+                                    ioException.printStackTrace();
+                                }
+                            }
+                        }).addTo(panel);
+                    }
+                    panel.addComponent(new EmptySpace());
+                }
             }
-            panel.addComponent(new EmptySpace());
+        }, 0, 5000);
 
-        }
         BasicWindow window = new BasicWindow();
         window.setComponent(panel);
         try {
