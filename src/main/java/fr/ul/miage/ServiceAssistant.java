@@ -83,7 +83,7 @@ public class ServiceAssistant extends Staff {
             @Override
             public void run() {
                 panel.removeAllComponents();
-                new Button("Déconnection", new Runnable() {
+                new Button("Déconnexion", new Runnable() {
                     @Override
                     public void run() {
                         try {

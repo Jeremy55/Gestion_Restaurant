@@ -75,7 +75,7 @@ public abstract class Staff {
 
     protected Panel deconnection(){
         Panel panel = new Panel();
-        new Button("Déconnection", new Runnable() {
+        new Button("Déconnexion", new Runnable() {
             @Override
             public void run() {
                 try {
