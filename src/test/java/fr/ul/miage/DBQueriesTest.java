@@ -283,21 +283,4 @@ public class DBQueriesTest {
         List<Preparation> prep = dbQueries.getPreparationID(listeID);
         assertEquals(prep.get(0)._id, id);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }

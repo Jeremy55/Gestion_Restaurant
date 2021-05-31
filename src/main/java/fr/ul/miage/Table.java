@@ -7,8 +7,9 @@ public class Table {
     private int numero;
     private int etage;
     private String etat;
-    private Order order;
+    private ObjectId Commande;
     private int nbCouvert;
+    private Order order;
 
     public Table(ObjectId _id, int numero, int etage, String etat, int nbCouvert) {
         this._id = _id;
@@ -27,41 +28,35 @@ public class Table {
         this.order = order;
     }
 
+    public Table(int etage, String etat, int nbCouvert) {
+        this.etage = etage;
+        this.etat = etat;
+        this.nbCouvert = nbCouvert;
+    }
+
     public ObjectId get_id() { return _id; }
 
     public void set_id(ObjectId _id) { this._id = _id; }
 
-    public int getNumero() {
-        return numero;
-    }
+    public int getNumero() { return numero; }
 
-    public void setNumero(int numero) {
-        this.numero = numero;
-    }
+    public void setNumero(int number) { this.numero = numero; }
 
-    public int getEtage() {
-        return etage;
-    }
+    public int getEtage() { return etage; }
 
-    public void setEtage(int etage) {
-        this.etage = etage;
-    }
+    public void setEtage(int etage) { this.etage = etage; }
 
-    public String getEtat() {
-        return etat;
-    }
+    public String getEtat() { return etat; }
 
-    public void setEtat(String etat) {
-        this.etat = etat;
-    }
+    public void setEtat(String etat) { this.etat = etat; }
 
-    public int getNbCouvert() {
-        return nbCouvert;
-    }
+    public int getNbCouvert() { return nbCouvert; }
 
-    public void setNbCouvert(int nbCouvert) {
-        this.nbCouvert = nbCouvert;
-    }
+    public void setNbCouvert(int nbCouvert) { this.nbCouvert = nbCouvert; }
+
+    public ObjectId getCommande() { return Commande; }
+
+    public void setCommande(ObjectId commande) { Commande = commande; }
 
     @Override
     public String toString() {
@@ -70,4 +65,5 @@ public class Table {
                 "\n etat : " + etat  +
                 "\n nbCouvert : " + nbCouvert;
     }
+
 }

@@ -2,6 +2,8 @@ package fr.ul.miage;
 
 import org.bson.types.ObjectId;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +14,13 @@ public class Order {
     private List<ObjectId> Preparation;
     private Double montant;
 
+    public Order(ObjectId _id, Double montant) {
+        this._id = _id;
+        this.dateDebut = DateTimeFormatter.ofPattern("dd-MM-uuuu HH:mm:ss").format(LocalDateTime.now());
+        this.montant = montant;
+        Preparation = new ArrayList<ObjectId>();
+    }
+/*
     public Order(ObjectId _id, String dateDebut, String dateFin, Double montant) {
         this._id = _id;
         this.dateDebut = dateDebut;
@@ -19,7 +28,7 @@ public class Order {
         this.montant = montant;
         Preparation = new ArrayList<ObjectId>();
     }
-
+*/
     public ObjectId get_id() {
         return _id;
     }
@@ -62,7 +71,8 @@ public class Order {
 
     @Override
     public String toString() {
-        return  "dateDebut='" + dateDebut + '\'' +
+        return  "_id='" + _id + '\'' +
+                ",dateDebut='" + dateDebut + '\'' +
                 ", dateFin='" + dateFin + '\'' +
                 ", Preparation=" + Preparation +
                 ", montant=" + montant;

@@ -13,6 +13,21 @@ public class Preparation implements Comparable<Preparation>{
     Boolean menuEnfant;
     Date trueDate;
 
+
+    public Preparation(String heureCommande, Boolean debut, ObjectId plat, Boolean menuEnfant) {
+        this.heureCommande = heureCommande;
+        this.debut = debut;
+        Plat = plat;
+        this.menuEnfant = menuEnfant;
+    }
+
+    public Preparation(ObjectId _id, Boolean debut, ObjectId plat, Boolean menuEnfant) {
+        this._id = _id;
+        this.debut = debut;
+        Plat = plat;
+        this.menuEnfant = menuEnfant;
+    }
+
     public Preparation(ObjectId _id, String heureCommande, Boolean debut, ObjectId plat, Boolean menuEnfant) {
         this._id = _id;
         this.heureCommande = heureCommande;
