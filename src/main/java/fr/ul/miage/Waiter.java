@@ -120,6 +120,7 @@ public class Waiter extends Staff {
         Panel panel = super.deconnection();
         panel.addComponent(new EmptySpace());
         Panel panelInfo = new Panel();
+
         panelInfo.addComponent(new Label(table.toString()));
         panel.addComponent(panelInfo);
         Timer timer = new Timer();
@@ -174,7 +175,6 @@ public class Waiter extends Staff {
      * Affichage des informations de la table en temps réel
      * @param panel
      * @param oidTables
-     * @param lbl
      * @param timer
      */
     private void tempsReelInfosTable(Panel panel, ObjectId oidTables, Timer timer){
@@ -186,7 +186,6 @@ public class Waiter extends Staff {
             }
         }, 0, 4000);
     }
-
 
     /**
      * Affiche la fenêtre terminale de la commande courante à une table donné
@@ -331,9 +330,9 @@ public class Waiter extends Staff {
             getDbQueries().newPreparation(p);
             ord.getPreparation().add(p._id);
             getDbQueries().newOrder(ord);
+            table.setCommande(ord.get_id());
             getDbQueries().addOrderToTable(table, ord.get_id());
             updateStockIngredient(plat);
-            //faire un if menu enfant
         }
         else{
             getDbQueries().newPreparation(p);
