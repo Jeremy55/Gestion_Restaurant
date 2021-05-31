@@ -98,7 +98,10 @@ public class Cook extends Staff {
     }
 
 
-
+    /**
+     * Permet d'être redirigé vers le panel qui affiche tous les ingrédients disponibles.
+     * @return Un bouton
+     */
     private Button buttonSeeIngredientsStock(){
         return new Button("Voir les Stocks d'ingrédients", new Runnable() {
             @Override
@@ -108,10 +111,10 @@ public class Cook extends Staff {
         });
     }
 
-    public  void test(){
-        setupWindowAndSwitch(panelIngredientsStock(),"Ingrédients en stock");
-    }
-
+    /**
+     *  Affichage des stocks en temps réel.
+     * @return Un panel qui contient les informations de stock.
+     */
     private Panel panelIngredientsStock(){
         Panel panel = new Panel();
         Timer timer = new Timer();
@@ -149,6 +152,11 @@ public class Cook extends Staff {
         return panel;
     }
 
+    /**
+     * Permet de trier une Arraylist de préparation en fonction des dates de commande et des menus enfant qui sont prioritaires.
+     * @param preparations Arraylist contenant des preparations qu'il faut trier.
+     * @return preparations dans l'ordre.
+     */
     public ArrayList<Preparation> orderPreparations(ArrayList<Preparation> preparations){
         // Etape 1 : Tranformation des string qui representent les dates en date réelle.
         for(Preparation p : preparations){
@@ -191,6 +199,12 @@ public class Cook extends Staff {
         });
     }
 
+    /**
+     * Panel qui permet de voir la composition d'une préparation et de la terminer.
+     * @param plat Le plat a préparer.
+     * @param preparation La préparation correspondant au plat.
+     * @return Un panel les informations d'une préparation ainsi qu'un bouton pour terminer cette préparation.
+     */
     private Panel panelStartPreparation(Plat plat, Preparation preparation){
         getDbQueries().updatePreparation(preparation);
         Panel panel = new Panel();
@@ -201,6 +215,11 @@ public class Cook extends Staff {
         return panel;
     }
 
+    /**
+     * Permet de modifier l'état "terminé" d'une préparation dans la BDD.
+     * @param p une préparation.
+     * @return Un bouton qui permet de terminer une préparation.
+     */
     private Button buttonFinishPreparation(Preparation p){
         return new Button("Préparation terminée", new Runnable() {
             @Override
@@ -212,6 +231,10 @@ public class Cook extends Staff {
         });
     }
 
+    /**
+     * Permet de créer un nouvelle recette qui correspond a un plat.
+     * @return Un bouton qui ouvre le formulaire de création de recette.
+     */
     private Button buttonAddRecipe(){
         return new Button("Ajouter un plat", new Runnable() {
             @Override
@@ -236,6 +259,10 @@ public class Cook extends Staff {
         });
     }
 
+    /**
+     * Combobox qui affiche toutes les catégories de la BDD.
+     * @return
+     */
     private ComboBox<String> ingredientComboBox(){
         ComboBox<String> ingredients = new ComboBox<String>();
         for(Ingredient i :super.getDbQueries().getIngredients()){
@@ -252,6 +279,12 @@ public class Cook extends Staff {
         return categories;
     }
 
+    /**
+     * Bouton qui permet d'ajouter une ComboBox d'ingrédients.
+     * @param panel Le panel dans lequel il faut ajouter la ComboBox.
+     * @param ingredientsList La liste de tous les ComboBox.
+     * @return Un bouton.
+     */
     private Button buttonAddIngredient(Panel panel,ArrayList<ComboBox<String>> ingredientsList){
         return new Button("Ajouter un ingredient", new Runnable() {
             @Override
@@ -263,6 +296,9 @@ public class Cook extends Staff {
         });
     }
 
+    /**
+     * @return Un bouton qui permet de retourner au menu principal.
+     */
     private Button buttonReturnMainmenu(){
         return new Button("Retour au menu", new Runnable() {
             @Override
@@ -272,6 +308,11 @@ public class Cook extends Staff {
         });
     }
 
+    /**
+     * Permet de retourner au menu principal et de cancel un timer en même temps (Utilisé pour les méthodes qui affiches des informations de la BDD en temps réel.)
+     * @param timer Le timer à cancel.
+     * @return Un bouton qui permet de retourner au menu principal.
+     */
     private Button buttonReturnMainmenu(Timer timer){
         return new Button("Retour au menu", new Runnable() {
             @Override
@@ -282,6 +323,13 @@ public class Cook extends Staff {
         });
     }
 
+    /**
+     * @param name
+     * @param ingredientList
+     * @param categorie
+     * @param prix
+     * @return Bouton qui permet d'ajouter un plat dans la BDD.
+     */
     private Button submitDish(TextBox name, ArrayList<ComboBox<String>> ingredientList,ComboBox categorie,TextBox prix){
         return new Button("Ajouter le nouveau plat", new Runnable() {
             @Override
